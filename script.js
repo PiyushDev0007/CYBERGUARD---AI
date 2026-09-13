@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const fileNameDisplay = document.getElementById("fileNameDisplay");
 
     const riskScore = document.getElementById("riskScore");
+    const meterBar = document.getElementById("meterBar");
     const threatStatus = document.getElementById("threatStatus");
     const explanation = document.getElementById("explanation");
     const severityBadge = document.getElementById("severityBadge");
@@ -12,10 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const xaiList = document.getElementById("xaiList");
     const hopChainWrapper = document.getElementById("hopChainWrapper");
     const hopChainLogs = document.getElementById("hopChainLogs");
+    const downloadReportBtn = document.getElementById("downloadReportBtn");
 
     const BACKEND_API = "http://localhost:8000";
+    let lastScanReport = null;
 
-    // Show attached filename
     if (qrFileInput && fileNameDisplay) {
         qrFileInput.addEventListener("change", function (e) {
             if (e.target.files && e.target.files.length > 0) {
@@ -23,6 +25,19 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 fileNameDisplay.textContent = "";
             }
+        });
+    }
+
+    if (downloadReportBtn) {
+        downloadReportBtn.addEventListener("click", function () {
+            if (!lastScanReport) return;
+            const blob = new Blob([JSON.stringify(lastScanReport, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `CYBERGUARD_INCIDENT_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         });
     }
 
@@ -34,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (input === "" && !uploadedFile) {
             riskScore.innerHTML = "Risk Score: <strong>--/100</strong>";
+            if (meterBar) meterBar.style.width = "0%";
             threatStatus.textContent = "⚠️ Please enter text/URL or attach a QR screenshot.";
             explanation.textContent = "Enter a URL, SMS, email or attach a file.";
             if (severityBadge) severityBadge.style.display = "none";
@@ -65,10 +81,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!response.ok) throw new Error("API Offline");
             const data = await response.json();
-            renderBackendResult(data);
+            renderBackendResult(data, input);
 
         } catch (err) {
-            // Fallback: Jab backend API locally run na ho rahi ho
             runAdvancedLocalAnalysis(input, uploadedFile);
         } finally {
             analyzeBtn.disabled = false;
@@ -76,11 +91,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    function renderBackendResult(data) {
+    function renderBackendResult(data, input) {
         const assessment = data.assessment || {};
         const score = assessment.risk_score || 0;
         const severity = assessment.severity || "LOW";
         const trace = data.trace || {};
+
+        lastScanReport = {
+            dossier_id: "CGX-" + Math.floor(100000 + Math.random() * 900000),
+            timestamp_utc: new Date().toISOString(),
+            evaluator: "CYBERGUARD X Multi-Signal Engine v2.4",
+            entry_input: input,
+            assessment: assessment,
+            trace: trace
+        };
 
         updateUI(score, severity, assessment.xai_breakdown || []);
 
@@ -96,10 +120,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function runAdvancedLocalAnalysis(input, uploadedFile) {
         if (uploadedFile && !input) {
-            updateUI(75, "HIGH", [
+            const reasons = [
                 "Quishing Payload: Image file attached for QR matrix extraction.",
-                "Engine quarantined destination URL pending headless browser unpack."
-            ]);
+                "Backend offline: Quarantined pending headless browser unpack."
+            ];
+            buildLocalDossier(75, "HIGH", reasons, "Uploaded Image / QR Code");
+            updateUI(75, "HIGH", reasons);
             return;
         }
 
@@ -135,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 3. Infrastructure & Obfuscation
+        // 3. Obfuscation & Infrastructure
         if (lower.includes("http://")) {
             score += 20;
             reasons.push("Transport Security: Unencrypted HTTP protocol origin.");
@@ -143,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (lower.includes("bit.ly") || lower.includes("tinyurl.com") || lower.includes("t.co") || lower.includes("cutt.ly")) {
             score += 25;
-            reasons.push("Infrastructure Cloaking: Shortener used to obscure true destination endpoint.");
+            reasons.push("Infrastructure Cloaking: Shortener used to obscure destination endpoint.");
         }
 
         const highRiskTLDs = [".su", ".top", ".xyz", ".click", ".work", ".me", ".online", ".link"];
@@ -157,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function () {
             reasons.push("Evasion Vector: Punycode homoglyph detected (visual deception).");
         }
 
-        // 4. Identity Impersonation Targets
         const targets = ["sbi", "hdfc", "microsoft", "google", "paytm", "netflix", "incometax"];
         targets.forEach(brand => {
             if (lower.includes(brand) && !lower.includes(brand + ".com") && !lower.includes(brand + ".co.in")) {
@@ -169,11 +194,31 @@ document.addEventListener("DOMContentLoaded", function () {
         score = Math.min(score, 100);
         const severity = score >= 75 ? "CRITICAL" : score >= 50 ? "HIGH" : score >= 25 ? "MEDIUM" : "LOW";
 
+        buildLocalDossier(score, severity, reasons, input);
         updateUI(score, severity, reasons);
+    }
+
+    function buildLocalDossier(score, severity, reasons, input) {
+        lastScanReport = {
+            dossier_id: "CGX-" + Math.floor(100000 + Math.random() * 900000),
+            timestamp_utc: new Date().toISOString(),
+            evaluator: "CYBERGUARD X Multi-Signal Engine v2.4 (Client Sandbox)",
+            entry_input: input,
+            assessment: {
+                risk_score: score,
+                severity: severity,
+                xai_breakdown: reasons
+            }
+        };
     }
 
     function updateUI(score, severity, reasons) {
         riskScore.innerHTML = `Risk Score: <strong>${score}/100</strong>`;
+
+        if (meterBar) {
+            meterBar.style.width = `${score}%`;
+            meterBar.style.background = score >= 75 ? "#f44336" : score >= 50 ? "#ff9800" : score >= 25 ? "#ffc107" : "#4caf50";
+        }
 
         if (severityBadge) {
             severityBadge.style.display = "inline-block";
@@ -212,4 +257,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
-                                
+        
