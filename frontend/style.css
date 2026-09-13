@@ -1,1 +1,111 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
+body {
+    font-family: Arial, sans-serif;
+    background: #07111f;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    padding: 35px 20px;
+    border-bottom: 1px solid #20334d;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #9fb3c8;
+}
+
+main {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+    display: grid;
+    gap: 25px;
+}
+
+.scanner,
+.result {
+    background: #0d1b2e;
+    border: 1px solid #29415f;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+h2 {
+    margin-bottom: 15px;
+}
+
+.scanner p {
+    color: #9fb3c8;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    background: #07111f;
+    color: #ffffff;
+    border: 1px solid #38516e;
+    border-radius: 10px;
+    resize: vertical;
+    font-size: 15px;
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #1769aa;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+#riskScore {
+    font-size: 24px;
+    margin: 15px 0;
+}
+
+#threatStatus {
+    padding: 15px;
+    border-radius: 10px;
+    background: #12263d;
+    margin-bottom: 15px;
+}
+
+#explanation {
+    color: #9fb3c8;
+    line-height: 1.6;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #71869d;
+    font-size: 13px;
+}
+
+@media (min-width: 700px) {
+    main {
+        grid-template-columns: 1fr 1fr;
+    }
+}
