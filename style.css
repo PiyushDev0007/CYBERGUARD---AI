@@ -68,7 +68,6 @@ textarea:focus {
     border-color: #1769aa;
 }
 
-/* QR / Quishing File Picker */
 .file-upload-wrapper {
     margin-top: 15px;
 }
@@ -127,6 +126,18 @@ button:disabled {
     opacity: 0.6;
 }
 
+/* Secondary Button for Incident Report */
+.secondary-btn {
+    background: #0f2744;
+    border: 1px solid #204c7d;
+    color: #64b5f6;
+    margin-top: 15px;
+}
+
+.secondary-btn:hover {
+    background: #14355d;
+}
+
 /* Result Section Header & Dynamic Badges */
 .result-header {
     display: flex;
@@ -170,7 +181,24 @@ button:disabled {
 
 #riskScore {
     font-size: 24px;
-    margin: 15px 0;
+    margin: 12px 0 6px 0;
+}
+
+/* Visual Meter Bar */
+.meter-container {
+    width: 100%;
+    height: 8px;
+    background: #07111f;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.meter-bar {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.4s ease, background 0.4s ease;
 }
 
 #threatStatus {
@@ -240,4 +268,5 @@ footer {
     main {
         grid-template-columns: 1fr 1fr;
     }
-}
+    }
+    
