@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>CYBERGUARD X</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🛡️ CYBERGUARD X</h1>
+        <p>AI-Powered Cyber Threat Detection & Response</p>
+    </header>
+
+    <main>
+
+        <section class="scanner">
+            <h2>Threat Scanner</h2>
+
+            <p>
+                Analyze suspicious URLs, messages, QR-related links
+                and digital threats.
+            </p>
+
+            <textarea
+                id="threatInput"
+                placeholder="Paste URL, SMS, email or suspicious content here..."
+            ></textarea>
+
+            <button id="analyzeBtn">
+                Analyze Threat
+            </button>
+        </section>
+
+        <section class="result">
+            <h2>Security Analysis</h2>
+
+            <div id="riskScore">
+                Risk Score: <strong>--/100</strong>
+            </div>
+
+            <div id="threatStatus">
+                Waiting for analysis...
+            </div>
+
+            <div id="explanation">
+                Detection explanation will appear here.
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>CYBERGUARD X • Advanced Digital Threat Intelligence Platform</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
