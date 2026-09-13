@@ -26,7 +26,6 @@
                 placeholder="Paste URL, SMS, email or suspicious content here..."
             ></textarea>
 
-            <!-- QR / Quishing File Upload Wrapper -->
             <div class="file-upload-wrapper">
                 <label for="qrFileInput" class="file-label">
                     <span>📷 Upload Suspicious QR / Screenshot</span>
@@ -49,6 +48,11 @@
                 Risk Score: <strong>--/100</strong>
             </div>
 
+            <!-- Visual Risk Meter Bar -->
+            <div class="meter-container">
+                <div id="meterBar" class="meter-bar"></div>
+            </div>
+
             <div id="threatStatus">
                 Waiting for analysis...
             </div>
@@ -62,11 +66,15 @@
                 <h3>Forensic & Behavioral Indicators (XAI):</h3>
                 <ul id="xaiList"></ul>
 
-                <!-- Multi-hop Redirect Logs -->
                 <div id="hopChainWrapper" style="display: none;">
                     <h4>Redirect Sequence Trace:</h4>
                     <pre id="hopChainLogs"></pre>
                 </div>
+
+                <!-- Feature 10: Automated Incident Report Downloader -->
+                <button id="downloadReportBtn" class="secondary-btn">
+                    📥 Download Incident Forensic Dossier (.JSON)
+                </button>
             </div>
         </section>
     </main>
