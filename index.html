@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>CYBERGUARD X</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
     <header>
@@ -17,13 +14,11 @@
     </header>
 
     <main>
-
+        <!-- Threat Scanner Section -->
         <section class="scanner">
             <h2>Threat Scanner</h2>
-
             <p>
-                Analyze suspicious URLs, messages, QR-related links
-                and digital threats.
+                Analyze suspicious URLs, messages, QR-related links and digital threats.
             </p>
 
             <textarea
@@ -31,13 +26,24 @@
                 placeholder="Paste URL, SMS, email or suspicious content here..."
             ></textarea>
 
-            <button id="analyzeBtn">
-                Analyze Threat
-            </button>
+            <!-- QR / Quishing File Upload Wrapper -->
+            <div class="file-upload-wrapper">
+                <label for="qrFileInput" class="file-label">
+                    <span>📷 Upload Suspicious QR / Screenshot</span>
+                </label>
+                <input type="file" id="qrFileInput" accept="image/*">
+                <span id="fileNameDisplay"></span>
+            </div>
+
+            <button id="analyzeBtn">Analyze Threat</button>
         </section>
 
+        <!-- Security Analysis Output Section -->
         <section class="result">
-            <h2>Security Analysis</h2>
+            <div class="result-header">
+                <h2>Security Analysis</h2>
+                <span id="severityBadge" class="badge">STANDBY</span>
+            </div>
 
             <div id="riskScore">
                 Risk Score: <strong>--/100</strong>
@@ -50,8 +56,19 @@
             <div id="explanation">
                 Detection explanation will appear here.
             </div>
-        </section>
 
+            <!-- XAI & Forensic Audit Box -->
+            <div id="forensicsWrapper" style="display: none;">
+                <h3>Forensic & Behavioral Indicators (XAI):</h3>
+                <ul id="xaiList"></ul>
+
+                <!-- Multi-hop Redirect Logs -->
+                <div id="hopChainWrapper" style="display: none;">
+                    <h4>Redirect Sequence Trace:</h4>
+                    <pre id="hopChainLogs"></pre>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -59,6 +76,5 @@
     </footer>
 
     <script src="script.js"></script>
-
 </body>
 </html>
