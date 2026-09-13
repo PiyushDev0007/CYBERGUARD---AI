@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const hopChainLogs = document.getElementById("hopChainLogs");
     const downloadReportBtn = document.getElementById("downloadReportBtn");
 
-    const BACKEND_API = "http://localhost:8000";
+    const BACKEND_API = "https://cyberguard-x-backend.onrender.com";
+    
     let lastScanReport = null;
 
     if (qrFileInput && fileNameDisplay) {
