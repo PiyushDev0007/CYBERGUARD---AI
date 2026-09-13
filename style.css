@@ -53,7 +53,7 @@ h2 {
 
 textarea {
     width: 100%;
-    min-height: 150px;
+    min-height: 140px;
     padding: 15px;
     background: #07111f;
     color: #ffffff;
@@ -61,6 +61,46 @@ textarea {
     border-radius: 10px;
     resize: vertical;
     font-size: 15px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #1769aa;
+}
+
+/* QR / Quishing File Picker */
+.file-upload-wrapper {
+    margin-top: 15px;
+}
+
+.file-upload-wrapper input[type="file"] {
+    display: none;
+}
+
+.file-label {
+    display: block;
+    padding: 12px;
+    border: 1px dashed #38516e;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: #9fb3c8;
+    background: #07111f;
+    transition: 0.2s ease;
+}
+
+.file-label:hover {
+    border-color: #1769aa;
+    color: #ffffff;
+}
+
+#fileNameDisplay {
+    display: block;
+    font-size: 12px;
+    color: #4caf50;
+    margin-top: 6px;
+    text-align: center;
 }
 
 button {
@@ -74,10 +114,58 @@ button {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: opacity 0.2s;
 }
 
 button:hover {
     opacity: 0.9;
+}
+
+button:disabled {
+    background: #20334d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Result Section Header & Dynamic Badges */
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.badge {
+    display: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
+
+.badge-low {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.badge-medium {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+}
+
+.badge-high {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid #ff9800;
+}
+
+.badge-critical {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid #f44336;
 }
 
 #riskScore {
@@ -90,11 +178,55 @@ button:hover {
     border-radius: 10px;
     background: #12263d;
     margin-bottom: 15px;
+    font-size: 15px;
 }
 
 #explanation {
     color: #9fb3c8;
     line-height: 1.6;
+    font-size: 14px;
+}
+
+/* Forensic Audit & XAI Factors */
+#forensicsWrapper {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #20334d;
+}
+
+#forensicsWrapper h3 {
+    font-size: 15px;
+    color: #64b5f6;
+    margin-bottom: 10px;
+}
+
+#xaiList {
+    padding-left: 20px;
+    color: #d1d9e6;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+#hopChainWrapper {
+    margin-top: 15px;
+}
+
+#hopChainWrapper h4 {
+    font-size: 13px;
+    color: #9fb3c8;
+    margin-bottom: 6px;
+}
+
+#hopChainLogs {
+    background: #07111f;
+    border: 1px solid #20334d;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #9fb3c8;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 footer {
