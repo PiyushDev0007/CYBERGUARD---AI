@@ -152,7 +152,7 @@ async def scan_text(content: str = Form(...)):
 
 @app.post("/scan/quishing")
 async def scan_quishing(file: UploadFile = File(...)):
-    temp_file = f"temp_{file.filename}"
+    temp_file = os.path.join("/tmp", f"temp_{file.filename}")
     with open(temp_file, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
@@ -198,4 +198,4 @@ async def scan_quishing(file: UploadFile = File(...)):
     finally:
         if os.path.exists(temp_file):
             os.remove(temp_file)
-        
+    
