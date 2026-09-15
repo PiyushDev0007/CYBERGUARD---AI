@@ -65,13 +65,19 @@ class CyberGuardRiskEngine:
         else:
             final_score = min(max(raw_score, 0.0), 100.0)
 
-        # XAI Attribution via SHAP
-        shap_values = self.explainer.shap_values(feature_vector)[0]
+        # XAI Attribution via SHAP (Flattened array prevents 1D/2D shape mismatch)
+        shap_raw = self.explainer.shap_values(feature_vector)
+        shap_values = np.array(shap_raw).flatten()
+
         attributions = [
             f"{name.replace('_', ' ').title()}: Impact +{round(float(val), 1)}"
             for name, val in zip(self.feature_names, shap_values)
             if val > 0.8
         ]
+
+        # Defensive fallback when no single feature exceeds attribution threshold
+        if not attributions:
+            attributions = ["Baseline Security: Feature signals within normal operating variance."]
 
         severity = (
             "CRITICAL" if final_score >= 75 else
@@ -83,5 +89,5 @@ class CyberGuardRiskEngine:
             "risk_score": round(final_score, 1),
             "severity": severity,
             "xai_breakdown": attributions
-      }
-              
+        }
+        
