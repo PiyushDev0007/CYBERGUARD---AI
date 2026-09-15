@@ -198,4 +198,4 @@ async def scan_quishing(file: UploadFile = File(...)):
     finally:
         if os.path.exists(temp_file):
             os.remove(temp_file)
-    
+
