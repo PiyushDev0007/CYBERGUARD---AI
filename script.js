@@ -8,7 +8,7 @@
    CONFIGURATION
    ========================================================= */
 
-const BACKEND_API = "https://cyberguard-x-backend.onrender.com";
+const BACKEND_API = "https://cybernexus-ai-td68.onrender.com";
 
 /* =========================================================
    DOM ELEMENTS
