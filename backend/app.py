@@ -208,12 +208,104 @@ async def scan_text(content: str = Form(...)):
       "status": "success",
       "input_type": "text/sms",
       "assessment": assessment,
-      
-  @app.post("/scan/quishing")
+
+      @app.post("/scan/text")
+async def scan_text(content: str = Form(...)):
+    content_lower = content.lower()
+    urgency_keywords = [
+        "urgent",
+        "immediately",
+        "blocked",
+        "suspended",
+        "lottery",
+        "winner",
+        "prize",
+        "otp",
+        "kyc update",
+    ]
+
+    matched = sum(1 for w in urgency_keywords if w in content_lower)
+    urgency_score = min(matched * 0.25, 1.0)
+    upi_anomaly = (
+        1
+        if any(h in content_lower for h in ["@ybl", "@okaxis", "@paytm", "upi://"])
+        else 0
+    )
+
+    signals = ThreatSignals(
+        domain_age_days=0.0,
+        redirect_hops=0,
+        typosquat_similarity=(
+            0.75 if any(b in content_lower for b in MONITORED_BRANDS) else 0.0
+        ),
+        nlp_urgency_score=urgency_score,
+        auth_failure_flag=0,
+        visual_brand_spoof=0.0,
+        external_ioc_hits=0,
+        upi_anomaly_flag=upi_anomaly,
+    )
+
+    assessment = risk_engine.evaluate(signals)
+    return {
+        "status": "success",
+        "input_type": "text/sms",
+        "assessment": assessment,
+    }
+
+
+@app.post("/scan/quishing")
 async def scan_quishing(file: UploadFile = File(...)):
-  temp_file = os.path.join("/tmp", f"temp_{file.filename}")
-  with open(temp_file, "wb") as buffer:
-    shutil.copyfileobj(file.file, buffer)
+    temp_file = os.path.join("/tmp", f"temp_{file.filename}")
+    with open(temp_file, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    try:
+        img = cv2.imread(temp_file)
+        if img is None:
+            return {"status": "error", "message": "Invalid image format"}
+
+        # OpenCV native QR detector
+        qr_detector = cv2.QRCodeDetector()
+        qr_url, pts, straight_qrcode = qr_detector.detectAndDecode(img)
+
+        if not qr_url:
+            return {
+                "status": "error",
+                "message": "No valid QR code payload detected.",
+            }
+
+        if not is_safe_target(qr_url):
+            raise HTTPException(
+                status_code=400,
+                detail="Security Exception: QR target is restricted.",
+            )
+
+        chain, final_url = await trace_url_hops(qr_url)
+
+        upi_flag = 1 if "upi://" in final_url.lower() else 0
+        signals = ThreatSignals(
+            domain_age_days=0.8,
+            redirect_hops=len(chain),
+            typosquat_similarity=0.5,
+            nlp_urgency_score=0.7,
+            auth_failure_flag=0,
+            visual_brand_spoof=0.8,
+            external_ioc_hits=1,
+            upi_anomaly_flag=upi_flag,
+        )
+
+        assessment = risk_engine.evaluate(signals)
+
+        return {
+            "status": "success",
+            "extracted_payload": qr_url,
+            "trace": {"final_url": final_url, "hops_detail": chain},
+            "assessment": assessment,
+        }
+    finally:
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+
 
   try:
     img = cv2.imread(temp_file)
