@@ -2,87 +2,270 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBERGUARD X</title>
-    <link rel="stylesheet" href="style.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="CYBERGUARD X — Advanced Cyber Threat Detection and Analysis Platform"
+    >
+
+    <title>CYBERGUARD X — Threat Intelligence Platform</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
+
 <body>
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
 
     <header>
         <h1>🛡️ CYBERGUARD X</h1>
-        <p>AI-Powered Cyber Threat Detection & Response</p>
+
+        <p>
+            AI-Powered Cyber Threat Detection &amp; Response
+        </p>
     </header>
 
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
     <main>
-        <!-- Threat Scanner Section -->
-        <section class="scanner">
-            <h2>Threat Scanner</h2>
+
+        <!-- =====================================================
+             THREAT SCANNER
+             ===================================================== -->
+
+        <section
+            class="scanner"
+            aria-labelledby="scannerTitle"
+        >
+
+            <h2 id="scannerTitle">
+                Threat Scanner
+            </h2>
+
             <p>
-                Analyze suspicious URLs, messages, QR-related links and digital threats.
+                Analyze suspicious URLs, SMS, email content,
+                QR codes and digital threat indicators.
             </p>
+
+
+            <!-- Text / URL / Message Input -->
+
+            <label
+                for="threatInput"
+                class="sr-only"
+            >
+                Threat input
+            </label>
 
             <textarea
                 id="threatInput"
-                placeholder="Paste URL, SMS, email or suspicious content here..."
+                rows="8"
+                placeholder="Paste a URL, SMS, email or suspicious content here..."
+                autocomplete="off"
+                spellcheck="false"
             ></textarea>
 
+
+            <!-- QR Upload -->
+
             <div class="file-upload-wrapper">
-                <label for="qrFileInput" class="file-label">
-                    <span>📷 Upload Suspicious QR / Screenshot</span>
+
+                <label
+                    for="qrFileInput"
+                    class="file-label"
+                >
+                    <span>
+                        📷 Upload Suspicious QR / Screenshot
+                    </span>
                 </label>
-                <input type="file" id="qrFileInput" accept="image/*">
-                <span id="fileNameDisplay"></span>
+
+                <input
+                    type="file"
+                    id="qrFileInput"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+
+                <span
+                    id="fileNameDisplay"
+                    aria-live="polite"
+                ></span>
+
             </div>
 
-            <button id="analyzeBtn">Analyze Threat</button>
+
+            <!-- Analyze Button -->
+
+            <button
+                id="analyzeBtn"
+                type="button"
+            >
+                Analyze Threat
+            </button>
+
         </section>
 
-        <!-- Security Analysis Output Section -->
-        <section class="result">
+
+        <!-- =====================================================
+             SECURITY ANALYSIS RESULT
+             ===================================================== -->
+
+        <section
+            class="result"
+            aria-labelledby="resultTitle"
+        >
+
             <div class="result-header">
-                <h2>Security Analysis</h2>
-                <span id="severityBadge" class="badge">STANDBY</span>
+
+                <h2 id="resultTitle">
+                    Security Analysis
+                </h2>
+
+                <span
+                    id="severityBadge"
+                    class="badge"
+                    style="display: none;"
+                >
+                    STANDBY
+                </span>
+
             </div>
 
-            <div id="riskScore">
-                Risk Score: <strong>--/100</strong>
+
+            <!-- Risk Score -->
+
+            <div
+                id="riskScore"
+                aria-live="polite"
+            >
+                Risk Score:
+                <strong>--/100</strong>
             </div>
 
-            <!-- Visual Risk Meter Bar -->
-            <div class="meter-container">
-                <div id="meterBar" class="meter-bar"></div>
+
+            <!-- Risk Meter -->
+
+            <div
+                class="meter-container"
+                role="progressbar"
+                aria-label="Threat risk score"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+            >
+
+                <div
+                    id="meterBar"
+                    class="meter-bar"
+                ></div>
+
             </div>
 
-            <div id="threatStatus">
+
+            <!-- Threat Status -->
+
+            <div
+                id="threatStatus"
+                aria-live="polite"
+            >
                 Waiting for analysis...
             </div>
 
-            <div id="explanation">
+
+            <!-- Explanation -->
+
+            <div
+                id="explanation"
+                aria-live="polite"
+            >
                 Detection explanation will appear here.
             </div>
 
-            <!-- XAI & Forensic Audit Box -->
-            <div id="forensicsWrapper" style="display: none;">
-                <h3>Forensic & Behavioral Indicators (XAI):</h3>
+
+            <!-- =================================================
+                 FORENSIC / XAI SECTION
+                 ================================================= -->
+
+            <div
+                id="forensicsWrapper"
+                style="display: none;"
+            >
+
+                <h3>
+                    Forensic &amp; Behavioral Indicators (XAI)
+                </h3>
+
+
+                <!-- XAI Factors -->
+
                 <ul id="xaiList"></ul>
 
-                <div id="hopChainWrapper" style="display: none;">
-                    <h4>Redirect Sequence Trace:</h4>
+
+                <!-- =================================================
+                     REDIRECT CHAIN
+                     ================================================= -->
+
+                <div
+                    id="hopChainWrapper"
+                    style="display: none;"
+                >
+
+                    <h4>
+                        Redirect Sequence Trace
+                    </h4>
+
                     <pre id="hopChainLogs"></pre>
+
                 </div>
 
-                <!-- Feature 10: Automated Incident Report Downloader -->
-                <button id="downloadReportBtn" class="secondary-btn">
+
+                <!-- =================================================
+                     INCIDENT REPORT
+                     ================================================= -->
+
+                <button
+                    id="downloadReportBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
                     📥 Download Incident Forensic Dossier (.JSON)
                 </button>
+
             </div>
+
         </section>
+
     </main>
 
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
     <footer>
-        <p>CYBERGUARD X • Advanced Digital Threat Intelligence Platform</p>
+        <p>
+            CYBERGUARD X • Advanced Digital Threat Intelligence Platform
+        </p>
     </footer>
 
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
     <script src="script.js"></script>
+
 </body>
-</html>
+                </html>
