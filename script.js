@@ -62,8 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
         analyzeBtn.textContent = "Analyzing Threat Vector...";
         threatStatus.textContent = "Running heuristic and deep-packet intelligence...";
 
-        try {
+                try {
             let response;
+            const isUrlPattern = /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/i;
+
             if (uploadedFile) {
                 const formData = new FormData();
                 formData.append("file", uploadedFile);
@@ -71,14 +73,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: "POST",
                     body: formData
                 });
-            } else {
+            } else if (isUrlPattern.test(input)) {
                 const formData = new FormData();
-                formData.append("target_url", input);
+                formData.append("target_url", input.startsWith("http") ? input : `https://${input}`);
                 response = await fetch(`${BACKEND_API}/scan/url`, {
                     method: "POST",
                     body: formData
                 });
+            } else {
+                const formData = new FormData();
+                formData.append("content", input);
+                response = await fetch(`${BACKEND_API}/scan/text`, {
+                    method: "POST",
+                    body: formData
+                });
             }
+                    
 
             if (!response.ok) throw new Error("API Offline");
             const data = await response.json();
