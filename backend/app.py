@@ -11,7 +11,6 @@ import cv2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from playwright.async_api import async_playwright
-from pyzbar.pyzbar import decode
 
 # AI Risk Engine import
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -209,14 +208,60 @@ async def scan_text(content: str = Form(...)):
       "status": "success",
       "input_type": "text/sms",
       "assessment": assessment,
-  }
-
-
-@app.post("/scan/quishing")
+      
+  @app.post("/scan/quishing")
 async def scan_quishing(file: UploadFile = File(...)):
   temp_file = os.path.join("/tmp", f"temp_{file.filename}")
   with open(temp_file, "wb") as buffer:
     shutil.copyfileobj(file.file, buffer)
+
+  try:
+    img = cv2.imread(temp_file)
+    if img is None:
+      return {"status": "error", "message": "Invalid image format"}
+
+    # OpenCV native QR detector (no pyzbar / libzbar0 required)
+    qr_detector = cv2.QRCodeDetector()
+    qr_url, pts, straight_qrcode = qr_detector.detectAndDecode(img)
+
+    if not qr_url:
+      return {
+          "status": "error",
+          "message": "No valid QR code payload detected.",
+      }
+
+    if not is_safe_target(qr_url):
+      raise HTTPException(
+          status_code=400,
+          detail="Security Exception: QR target is restricted.",
+      )
+
+    chain, final_url = await trace_url_hops(qr_url)
+
+    upi_flag = 1 if "upi://" in final_url.lower() else 0
+    signals = ThreatSignals(
+        domain_age_days=0.8,
+        redirect_hops=len(chain),
+        typosquat_similarity=0.5,
+        nlp_urgency_score=0.7,
+        auth_failure_flag=0,
+        visual_brand_spoof=0.8,
+        external_ioc_hits=1,
+        upi_anomaly_flag=upi_flag,
+    )
+
+    assessment = risk_engine.evaluate(signals)
+
+    return {
+        "status": "success",
+        "extracted_payload": qr_url,
+        "trace": {"final_url": final_url, "hops_detail": chain},
+        "assessment": assessment,
+    }
+  finally:
+    if os.path.exists(temp_file):
+      os.remove(temp_file)
+        
 
   try:
     img = cv2.imread(temp_file)
