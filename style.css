@@ -1,272 +1,472 @@
+/* =========================================================
+   CYBERGUARD X — Frontend Styles
+   ========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #07111f;
-    color: #ffffff;
-    min-height: 100vh;
+:root {
+    --bg-primary: #070b14;
+    --bg-secondary: #0d1422;
+    --bg-card: #111a2b;
+    --border: #22304a;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --critical: #dc2626;
+    --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 35%),
+        var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 header {
+    padding: 28px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(7, 11, 20, 0.92);
     text-align: center;
-    padding: 35px 20px;
-    border-bottom: 1px solid #20334d;
 }
 
 header h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    letter-spacing: 1px;
 }
 
 header p {
-    color: #9fb3c8;
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
 }
 
+/* =========================================================
+   MAIN
+   ========================================================= */
+
 main {
-    width: 90%;
-    max-width: 900px;
-    margin: 40px auto;
-    display: grid;
-    gap: 25px;
+    width: min(1100px, calc(100% - 30px));
+    margin: 30px auto;
 }
+
+section {
+    margin-bottom: 24px;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
 
 .scanner,
 .result {
-    background: #0d1b2e;
-    border: 1px solid #29415f;
-    border-radius: 15px;
-    padding: 25px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow);
 }
 
-h2 {
-    margin-bottom: 15px;
+.scanner h2,
+.result h2 {
+    margin-bottom: 8px;
+    font-size: 1.35rem;
 }
 
-.scanner p {
-    color: #9fb3c8;
-    margin-bottom: 20px;
+.scanner-description {
+    color: var(--text-secondary);
+    margin-bottom: 18px;
 }
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
 
 textarea {
     width: 100%;
-    min-height: 140px;
-    padding: 15px;
-    background: #07111f;
-    color: #ffffff;
-    border: 1px solid #38516e;
-    border-radius: 10px;
+    min-height: 170px;
     resize: vertical;
-    font-size: 15px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #080f1d;
+    color: var(--text-primary);
+    font: inherit;
+    outline: none;
+}
+
+textarea::placeholder {
+    color: #64748b;
 }
 
 textarea:focus {
-    outline: none;
-    border-color: #1769aa;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
 }
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
 
 .file-upload-wrapper {
-    margin-top: 15px;
-}
-
-.file-upload-wrapper input[type="file"] {
-    display: none;
+    margin-top: 16px;
 }
 
 .file-label {
-    display: block;
-    padding: 12px;
-    border: 1px dashed #38516e;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px dashed var(--accent);
     border-radius: 10px;
-    text-align: center;
+    color: var(--accent);
     cursor: pointer;
-    font-size: 14px;
-    color: #9fb3c8;
-    background: #07111f;
     transition: 0.2s ease;
 }
 
 .file-label:hover {
-    border-color: #1769aa;
-    color: #ffffff;
+    background: rgba(56, 189, 248, 0.08);
+}
+
+#qrFileInput {
+    display: none;
 }
 
 #fileNameDisplay {
-    display: block;
-    font-size: 12px;
-    color: #4caf50;
-    margin-top: 6px;
-    text-align: center;
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    word-break: break-word;
 }
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 button {
-    margin-top: 15px;
-    width: 100%;
-    padding: 14px;
+    font: inherit;
+}
+
+#analyzeBtn,
+#downloadReportBtn {
+    margin-top: 18px;
+    min-height: 46px;
+    padding: 11px 20px;
     border: none;
     border-radius: 10px;
-    background: #1769aa;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
+    background: var(--accent);
+    color: #03111c;
+    font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
 }
 
-button:hover {
-    opacity: 0.9;
+#analyzeBtn:hover,
+#downloadReportBtn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
-button:disabled {
-    background: #20334d;
+#analyzeBtn:disabled,
+#downloadReportBtn:disabled {
+    opacity: 0.55;
     cursor: not-allowed;
-    opacity: 0.6;
+    transform: none;
 }
 
-/* Secondary Button for Incident Report */
 .secondary-btn {
-    background: #0f2744;
-    border: 1px solid #204c7d;
-    color: #64b5f6;
-    margin-top: 15px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
 }
 
 .secondary-btn:hover {
-    background: #14355d;
+    border-color: var(--accent);
 }
 
-/* Result Section Header & Dynamic Badges */
+/* =========================================================
+   RESULT HEADER
+   ========================================================= */
+
 .result-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
+/* =========================================================
+   SEVERITY BADGES
+   ========================================================= */
+
 .badge {
-    display: none;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 95px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .badge-low {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-    border: 1px solid #4caf50;
+    border-color: var(--success);
+    color: var(--success);
 }
 
 .badge-medium {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
-    border: 1px solid #ffc107;
+    border-color: var(--warning);
+    color: var(--warning);
 }
 
 .badge-high {
-    background: rgba(255, 152, 0, 0.2);
-    color: #ff9800;
-    border: 1px solid #ff9800;
+    border-color: #fb923c;
+    color: #fb923c;
 }
 
 .badge-critical {
-    background: rgba(244, 67, 54, 0.2);
-    color: #f44336;
-    border: 1px solid #f44336;
+    border-color: var(--critical);
+    color: var(--critical);
+}
+
+/* =========================================================
+   RISK SCORE
+   ========================================================= */
+
+.risk-score-wrapper {
+    margin-top: 22px;
+    text-align: center;
 }
 
 #riskScore {
-    font-size: 24px;
-    margin: 12px 0 6px 0;
+    font-size: clamp(3rem, 12vw, 5.5rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -2px;
 }
 
-/* Visual Meter Bar */
+.risk-score-label {
+    margin-top: 8px;
+    color: var(--text-secondary);
+}
+
+/* =========================================================
+   RISK METER
+   ========================================================= */
+
 .meter-container {
     width: 100%;
-    height: 8px;
-    background: #07111f;
-    border-radius: 4px;
+    height: 14px;
+    margin-top: 18px;
     overflow: hidden;
-    margin-bottom: 14px;
+    border-radius: 999px;
+    background: #1e293b;
 }
 
 .meter-bar {
     width: 0%;
     height: 100%;
-    background: #4caf50;
-    transition: width 0.4s ease, background 0.4s ease;
+    border-radius: inherit;
+    background: var(--success);
+    transition:
+        width 0.6s ease,
+        background 0.3s ease;
 }
 
+/* =========================================================
+   THREAT STATUS
+   ========================================================= */
+
 #threatStatus {
-    padding: 15px;
-    border-radius: 10px;
-    background: #12263d;
-    margin-bottom: 15px;
-    font-size: 15px;
+    margin-top: 20px;
+    font-size: 1.15rem;
+    font-weight: 700;
 }
 
 #explanation {
-    color: #9fb3c8;
-    line-height: 1.6;
-    font-size: 14px;
+    margin-top: 8px;
+    color: var(--text-secondary);
+    word-break: break-word;
 }
 
-/* Forensic Audit & XAI Factors */
+/* =========================================================
+   FORENSICS
+   ========================================================= */
+
 #forensicsWrapper {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #20334d;
+    margin-top: 25px;
 }
 
-#forensicsWrapper h3 {
-    font-size: 15px;
-    color: #64b5f6;
-    margin-bottom: 10px;
+#forensicsWrapper h3,
+#hopChainWrapper h3 {
+    margin-bottom: 12px;
+    font-size: 1.05rem;
 }
+
+/* =========================================================
+   XAI BREAKDOWN
+   ========================================================= */
 
 #xaiList {
-    padding-left: 20px;
-    color: #d1d9e6;
-    font-size: 13px;
-    line-height: 1.6;
+    display: grid;
+    gap: 10px;
+    list-style: none;
 }
+
+#xaiList li {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #0a1220;
+    color: var(--text-secondary);
+    word-break: break-word;
+}
+
+#xaiList li strong {
+    color: var(--text-primary);
+}
+
+/* =========================================================
+   REDIRECT / HOP CHAIN
+   ========================================================= */
 
 #hopChainWrapper {
-    margin-top: 15px;
-}
-
-#hopChainWrapper h4 {
-    font-size: 13px;
-    color: #9fb3c8;
-    margin-bottom: 6px;
+    margin-top: 24px;
 }
 
 #hopChainLogs {
-    background: #07111f;
-    border: 1px solid #20334d;
-    padding: 12px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 12px;
-    color: #9fb3c8;
-    white-space: pre-wrap;
+    display: grid;
+    gap: 8px;
+}
+
+.hop-item {
+    padding: 11px 13px;
+    border-left: 3px solid var(--accent);
+    background: #0a1220;
+    border-radius: 0 8px 8px 0;
+    color: var(--text-secondary);
     word-break: break-all;
 }
 
-footer {
-    text-align: center;
-    padding: 30px 15px;
-    color: #71869d;
-    font-size: 13px;
+.hop-item strong {
+    color: var(--text-primary);
 }
+
+/* =========================================================
+   DOWNLOAD REPORT
+   ========================================================= */
+
+#downloadReportBtn {
+    margin-top: 25px;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    padding: 25px 15px 35px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+footer strong {
+    color: var(--text-primary);
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+button:focus-visible,
+label:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
 
 @media (min-width: 700px) {
     main {
-        grid-template-columns: 1fr 1fr;
+        margin-top: 45px;
+    }
+
+    .scanner,
+    .result {
+        padding: 30px;
+    }
+
+    .result-header {
+        flex-wrap: nowrap;
     }
 }
 
+@media (max-width: 480px) {
+    main {
+        width: min(100% - 20px, 1100px);
+        margin: 20px auto;
+    }
+
+    .scanner,
+    .result {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    textarea {
+        min-height: 140px;
+    }
+
+    #analyzeBtn,
+    #downloadReportBtn {
+        width: 100%;
+    }
+
+    .file-label {
+        width: 100%;
+    }
+    }
