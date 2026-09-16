@@ -1,4 +1,4 @@
-CYBERGUARD X
+CYBERNEXUS AI
 
 AI-Powered Cyber Threat, Phishing & Digital Scam Detection Platform
 
