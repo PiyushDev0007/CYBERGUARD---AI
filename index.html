@@ -1,271 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="CYBERGUARD X — Advanced Cyber Threat Detection and Analysis Platform"
-    >
-
-    <title>CYBERGUARD X — Threat Intelligence Platform</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CYBERGUARD X advanced cybersecurity detection and incident-response console.">
+<meta name="theme-color" content="#07111f">
+<title>CYBERGUARD X | Security Operations Console</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-    <!-- =========================================================
-         HEADER
-         ========================================================= -->
-
-    <header>
-        <h1>🛡️ CYBERGUARD X</h1>
-
-        <p>
-            AI-Powered Cyber Threat Detection &amp; Response
-        </p>
-    </header>
-
-
-    <!-- =========================================================
-         MAIN CONTENT
-         ========================================================= -->
-
-    <main>
-
-        <!-- =====================================================
-             THREAT SCANNER
-             ===================================================== -->
-
-        <section
-            class="scanner"
-            aria-labelledby="scannerTitle"
-        >
-
-            <h2 id="scannerTitle">
-                Threat Scanner
-            </h2>
-
-            <p>
-                Analyze suspicious URLs, SMS, email content,
-                QR codes and digital threat indicators.
-            </p>
-
-
-            <!-- Text / URL / Message Input -->
-
-            <label
-                for="threatInput"
-                class="sr-only"
-            >
-                Threat input
-            </label>
-
-            <textarea
-                id="threatInput"
-                rows="8"
-                placeholder="Paste a URL, SMS, email or suspicious content here..."
-                autocomplete="off"
-                spellcheck="false"
-            ></textarea>
-
-
-            <!-- QR Upload -->
-
-            <div class="file-upload-wrapper">
-
-                <label
-                    for="qrFileInput"
-                    class="file-label"
-                >
-                    <span>
-                        📷 Upload Suspicious QR / Screenshot
-                    </span>
-                </label>
-
-                <input
-                    type="file"
-                    id="qrFileInput"
-                    accept="image/png,image/jpeg,image/webp"
-                >
-
-                <span
-                    id="fileNameDisplay"
-                    aria-live="polite"
-                ></span>
-
-            </div>
-
-
-            <!-- Analyze Button -->
-
-            <button
-                id="analyzeBtn"
-                type="button"
-            >
-                Analyze Threat
-            </button>
-
-        </section>
-
-
-        <!-- =====================================================
-             SECURITY ANALYSIS RESULT
-             ===================================================== -->
-
-        <section
-            class="result"
-            aria-labelledby="resultTitle"
-        >
-
-            <div class="result-header">
-
-                <h2 id="resultTitle">
-                    Security Analysis
-                </h2>
-
-                <span
-                    id="severityBadge"
-                    class="badge"
-                    style="display: none;"
-                >
-                    STANDBY
-                </span>
-
-            </div>
-
-
-            <!-- Risk Score -->
-
-            <div
-                id="riskScore"
-                aria-live="polite"
-            >
-                Risk Score:
-                <strong>--/100</strong>
-            </div>
-
-
-            <!-- Risk Meter -->
-
-            <div
-                class="meter-container"
-                role="progressbar"
-                aria-label="Threat risk score"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow="0"
-            >
-
-                <div
-                    id="meterBar"
-                    class="meter-bar"
-                ></div>
-
-            </div>
-
-
-            <!-- Threat Status -->
-
-            <div
-                id="threatStatus"
-                aria-live="polite"
-            >
-                Waiting for analysis...
-            </div>
-
-
-            <!-- Explanation -->
-
-            <div
-                id="explanation"
-                aria-live="polite"
-            >
-                Detection explanation will appear here.
-            </div>
-
-
-            <!-- =================================================
-                 FORENSIC / XAI SECTION
-                 ================================================= -->
-
-            <div
-                id="forensicsWrapper"
-                style="display: none;"
-            >
-
-                <h3>
-                    Forensic &amp; Behavioral Indicators (XAI)
-                </h3>
-
-
-                <!-- XAI Factors -->
-
-                <ul id="xaiList"></ul>
-
-
-                <!-- =================================================
-                     REDIRECT CHAIN
-                     ================================================= -->
-
-                <div
-                    id="hopChainWrapper"
-                    style="display: none;"
-                >
-
-                    <h4>
-                        Redirect Sequence Trace
-                    </h4>
-
-                    <pre id="hopChainLogs"></pre>
-
-                </div>
-
-
-                <!-- =================================================
-                     INCIDENT REPORT
-                     ================================================= -->
-
-                <button
-                    id="downloadReportBtn"
-                    class="secondary-btn"
-                    type="button"
-                >
-                    📥 Download Incident Forensic Dossier (.JSON)
-                </button>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- =========================================================
-         FOOTER
-         ========================================================= -->
-
-    <footer>
-        <p>
-            CYBERGUARD X • Advanced Digital Threat Intelligence Platform
-        </p>
-    </footer>
-
-
-    <!-- =========================================================
-         JAVASCRIPT
-         ========================================================= -->
-
-    <script src="script.js"></script>
-
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="./" aria-label="CYBERGUARD X home"><span class="brand-mark" aria-hidden="true">✦</span><span><strong>CYBERGUARD <em>X</em></strong><small>Advanced threat intelligence</small></span></a>
+    <div class="header-actions"><span class="connection-status"><i id="connectionDot"></i><span id="headerStatus">Checking backend</span></span><button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme">◐</button></div>
+  </div>
+</header>
+<main id="main-content" class="container">
+<section class="hero"><div><p class="eyebrow">SECURITY OPERATIONS CONSOLE</p><h1>Detect the signal<br><span>before the incident.</span></h1><p class="hero-text">A unified workspace for phishing, quishing, social-engineering, impersonation and UPI/KYC scam analysis.</p></div><div class="hero-status"><span class="pulse"></span><div><strong>Defensive analysis mode</strong><small>Evidence-led scoring · Human review recommended</small></div></div></section>
+<section class="metric-strip" aria-label="Security telemetry"><div><span class="metric-label">ENGINE STATUS</span><strong id="engineMetric">READY</strong></div><div><span class="metric-label">ACTIVE SIGNALS</span><strong id="signalMetric">—</strong></div><div><span class="metric-label">LAST SCAN</span><strong id="lastScanMetric">—</strong></div><div><span class="metric-label">ALERT POLICY</span><strong>HIGH / CRITICAL</strong></div></section>
+<section class="workspace-grid">
+<article class="panel scanner-panel"><div class="panel-heading"><div><p class="eyebrow">01 / COLLECT</p><h2>Submit an indicator</h2></div><span class="panel-code">INGEST</span></div><p class="muted">Analyze a URL, SMS, email, UPI/KYC message or QR image. Do not submit passwords, OTPs, tokens or private credentials.</p>
+<label class="field-label" for="threatInput">Message, URL or payment content</label><textarea id="threatInput" maxlength="50000" rows="8" placeholder="Paste suspicious content here…" autocomplete="off" spellcheck="false"></textarea><div class="field-footer"><span>URL and message extraction enabled</span><span id="characterCount">0 / 50,000</span></div>
+<div class="or-divider"><span>OR</span></div><div id="uploadZone" class="upload-zone"><input id="qrFileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden><label class="upload-label" for="qrFileInput"><span class="upload-icon" aria-hidden="true">⌁</span><span><strong>Upload QR or screenshot</strong><small>PNG, JPG or WEBP · decoded in the analysis pipeline</small></span><span class="upload-action">Browse</span></label><p id="fileNameDisplay" class="file-name" aria-live="polite">No file selected</p></div>
+<div class="action-row"><button id="analyzeBtn" class="primary-btn" type="button"><span aria-hidden="true">▶</span> Analyze threat</button><button id="clearBtn" class="ghost-btn" type="button">Clear</button></div><p class="privacy-note">▣ Defensive analysis only · Results are decision support, not proof of malicious activity.</p></article>
+<article class="panel result-panel" aria-labelledby="resultTitle"><div class="panel-heading"><div><p class="eyebrow">02 / DECIDE</p><h2 id="resultTitle">Unified risk assessment</h2></div><span id="severityBadge" class="severity-badge severity-standby">STANDBY</span></div>
+<div class="score-card"><div class="score-label">MULTI-SIGNAL RISK SCORE</div><div class="score-line"><span id="riskScore">—</span><span>/100</span></div><div class="meter-container" role="progressbar" aria-label="Threat risk score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="meterBar" class="meter-bar"></div></div><div class="score-scale"><span>LOW</span><span>MEDIUM</span><span>HIGH</span><span>CRITICAL</span></div></div>
+<div class="assessment-status"><span id="statusIcon" class="status-icon" aria-hidden="true">•</span><div><strong id="threatStatus">Waiting for analysis</strong><p id="explanation">Submit an indicator to receive contextual findings and a unified risk score.</p></div></div>
+<div id="forensicsWrapper" class="forensics" hidden><div class="section-title-row"><h3>Explainable findings</h3><span id="findingCount" class="count-badge">0</span></div><ul id="xaiList" class="finding-list"></ul><div id="hopChainWrapper" class="redirect-section" hidden><div class="section-title-row"><h3>Redirect sequence</h3><span class="subtle-label">TRACE</span></div><div id="hopChainLogs" class="hop-list"></div></div><div class="report-actions"><button id="downloadReportBtn" class="secondary-btn" type="button">Download JSON dossier</button><button id="downloadPdfBtn" class="secondary-btn" type="button">Request PDF report</button></div></div></article>
+</section>
+<section class="dashboard-grid"><article class="panel telemetry-panel"><div class="panel-heading"><div><p class="eyebrow">03 / MONITOR</p><h2>Threat telemetry</h2></div><span class="live-label"><i></i> LIVE UI</span></div><div class="telemetry-list"><div><span>URL intelligence</span><strong id="urlSignal">Ready</strong></div><div><span>QR / quishing defense</span><strong id="qrSignal">Ready</strong></div><div><span>NLP scam analysis</span><strong id="nlpSignal">Ready</strong></div><div><span>UPI / KYC intelligence</span><strong id="upiSignal">Ready</strong></div><div><span>Threat correlation</span><strong id="correlationSignal">Awaiting events</strong></div></div></article><article class="panel incident-panel"><div class="panel-heading"><div><p class="eyebrow">04 / RESPOND</p><h2>Incident readiness</h2></div><span class="panel-code">AUDIT</span></div><div class="incident-empty" id="incidentState"><span class="incident-icon" aria-hidden="true">✓</span><strong>No active incident</strong><p>High and Critical assessments should be escalated for review, evidence preservation and containment.</p></div><div id="incidentActions" class="incident-actions" hidden><button id="copyIncidentBtn" class="ghost-btn" type="button">Copy incident summary</button></div></article></section>
+<section class="capability-grid" aria-label="Detection capabilities"><div><span>01</span><h3>URL intelligence</h3><p>Structure, redirects, lookalikes and reputation evidence.</p></div><div><span>02</span><h3>Quishing defense</h3><p>QR payload extraction and destination inspection.</p></div><div><span>03</span><h3>Social engineering</h3><p>Urgency, pretexting, fear and financial language signals.</p></div><div><span>04</span><h3>Forensic output</h3><p>Explainable findings, traces and downloadable evidence.</p></div></section>
+<p id="liveRegion" class="sr-only" aria-live="polite"></p></main>
+<footer class="site-footer"><div class="container footer-inner"><span>CYBERGUARD X</span><span>Advanced defensive analysis console · <span id="footerYear"></span></span></div></footer>
+<script src="script.js"></script>
+<script>
+(() => {
+ const input=document.getElementById('threatInput'), count=document.getElementById('characterCount'), file=document.getElementById('qrFileInput'), name=document.getElementById('fileNameDisplay'), zone=document.getElementById('uploadZone'), clear=document.getElementById('clearBtn'), theme=document.getElementById('themeToggle');
+ const update=()=>{count.textContent=input.value.length.toLocaleString()+' / 50,000';}; input.addEventListener('input',update); update();
+ file.addEventListener('change',()=>{const f=file.files&&file.files[0]; name.textContent=f?'Selected: '+f.name:'No file selected';});
+ ['dragenter','dragover'].forEach(e=>zone.addEventListener(e,x=>{x.preventDefault();zone.classList.add('dragging');})); ['dragleave','drop'].forEach(e=>zone.addEventListener(e,x=>{x.preventDefault();zone.classList.remove('dragging');}));
+ zone.addEventListener('drop',e=>{const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f){file.files=e.dataTransfer.files;file.dispatchEvent(new Event('change'));}});
+ clear.addEventListener('click',()=>{input.value='';file.value='';name.textContent='No file selected';update();if(typeof resetResults==='function')resetResults();document.getElementById('liveRegion').textContent='Input cleared.';});
+ theme.addEventListener('click',()=>{document.body.classList.toggle('light-mode');}); document.getElementById('footerYear').textContent=new Date().getFullYear();
+ window.addEventListener('cyberguard:scan-start',()=>{document.getElementById('engineMetric').textContent='ANALYZING';});
+ window.addEventListener('cyberguard:scan-result',e=>{const d=e.detail||{},a=d.assessment||d.result||d;const score=Number(a.score??a.risk_score);document.getElementById('lastScanMetric').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});document.getElementById('signalMetric').textContent=Number.isFinite(score)?Math.round(score)+'/100':'—';document.getElementById('engineMetric').textContent='READY';});
+})();
+</script>
 </body>
-                </html>
+</html>
