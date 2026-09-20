@@ -1242,3 +1242,46 @@ if __name__ == "__main__":
         print(
             f" - {item}"
         )
+import requests
+import os
+import base64
+
+# VirusTotal API Key Configuration
+VIRUSTOTAL_API_KEY = os.getenv("VIRUSTOTAL_API_KEY", "apna_api_key_yahan_daalein")
+
+async def check_virustotal_url(target_url: str):
+    """
+    Checks target URL reputation against VirusTotal v3 API.
+    Returns scan status and malicious vote counts.
+    """
+    if not VIRUSTOTAL_API_KEY or VIRUSTOTAL_API_KEY == "apna_api_key_yahan_daalein":
+        return {"scanned": False, "malicious_votes": 0, "reason": "API key not configured"}
+
+    endpoint = "https://www.virustotal.com/api/v3/urls"
+    
+    # VirusTotal expects URL identifier to be base64url encoded without padding
+    url_id = base64.urlsafe_b64encode(target_url.encode()).decode().strip("=")
+    headers = {
+        "x-apikey": VIRUSTOTAL_API_KEY
+    }
+
+    try:
+        response = requests.get(f"{endpoint}/{url_id}", headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            stats = data.get("data", {}).get("attributes", {}).get("last_analysis_stats", {})
+            malicious_count = stats.get("malicious", 0)
+            
+            return {
+                "scanned": True,
+                "malicious_votes": malicious_count,
+                "stats": stats
+            }
+        elif response.status_code == 404:
+            # URL not found in VT database yet, can be submitted if needed
+            return {"scanned": True, "malicious_votes": 0, "note": "URL not found in VT cache"}
+    except Exception as e:
+        print(f"VirusTotal API Connection Error: {e}")
+    
+    return {"scanned": False, "malicious_votes": 0}
+    
