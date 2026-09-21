@@ -408,7 +408,321 @@ def detect_url_obfuscation(target_url: str) -> list[str]:
         )
 
     return findings
+# ============================================================
+# ADVANCED URL INTELLIGENCE
+# ============================================================
 
+async def get_domain_registration_age(domain: str):
+    """
+    Best-effort RDAP lookup for domain registration information.
+
+    Returns:
+        {
+            "age_days": int | None,
+            "registration_date": str | None,
+            "source": "RDAP" | None
+        }
+
+    This is intelligence enrichment only.
+    If RDAP is unavailable, the scanner continues safely.
+    """
+
+    domain = str(domain or "").lower().strip().rstrip(".")
+
+    if not domain:
+        return {
+            "age_days": None,
+            "registration_date": None,
+            "source": None,
+        }
+
+    try:
+        timeout = httpx.Timeout(
+            connect=3.0,
+            read=5.0,
+            write=5.0,
+            pool=5.0,
+        )
+
+        async with httpx.AsyncClient(
+            timeout=timeout,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "CYBERGUARD-X/1.0"
+            },
+        ) as client:
+
+            response = await client.get(
+                f"https://rdap.org/domain/{domain}"
+            )
+
+            if response.status_code != 200:
+                return {
+                    "age_days": None,
+                    "registration_date": None,
+                    "source": None,
+                }
+
+            data = response.json()
+
+        events = data.get("events", [])
+
+        registration_date = None
+
+        for event in events:
+
+            event_action = str(
+                event.get("eventAction", "")
+            ).lower()
+
+            if event_action in {
+                "registration",
+                "registered",
+                "registration date",
+            }:
+
+                registration_date = event.get(
+                    "eventDate"
+                )
+
+                if registration_date:
+                    break
+
+        if not registration_date:
+            return {
+                "age_days": None,
+                "registration_date": None,
+                "source": None,
+            }
+
+        from datetime import datetime, timezone
+
+        parsed_date = datetime.fromisoformat(
+            registration_date.replace(
+                "Z",
+                "+00:00"
+            )
+        )
+
+        now = datetime.now(timezone.utc)
+
+        age_days = max(
+            0,
+            (now - parsed_date).days,
+        )
+
+        return {
+            "age_days": age_days,
+            "registration_date": registration_date,
+            "source": "RDAP",
+        }
+
+    except Exception:
+        # Intelligence enrichment must never break
+        # the main security scanner.
+        return {
+            "age_days": None,
+            "registration_date": None,
+            "source": None,
+        }
+
+
+def advanced_typosquat_analysis(domain: str) -> dict:
+    """
+    More detailed brand/domain similarity analysis.
+
+    Returns:
+        {
+            "score": float,
+            "matched_brand": str | None,
+            "signals": list[str]
+        }
+    """
+
+    domain = str(domain or "").lower().strip()
+    domain = domain.rstrip(".")
+
+    if not domain:
+        return {
+            "score": 0.0,
+            "matched_brand": None,
+            "signals": [],
+        }
+
+    labels = domain.split(".")
+
+    if len(labels) >= 2:
+        main_domain = labels[-2]
+    else:
+        main_domain = labels[0]
+
+    best_score = 0.0
+    best_brand = None
+    signals = []
+
+    for brand in MONITORED_BRANDS:
+
+        brand = brand.lower()
+
+        if main_domain == brand:
+            continue
+
+        similarity = SequenceMatcher(
+            None,
+            main_domain,
+            brand,
+        ).ratio()
+
+        # Strong similarity
+        if similarity > best_score:
+            best_score = similarity
+            best_brand = brand
+
+    if best_brand:
+
+        if best_score >= 0.90:
+            signals.append(
+                f"Very high similarity to monitored brand: {best_brand}."
+            )
+
+        elif best_score >= 0.75:
+            signals.append(
+                f"High similarity to monitored brand: {best_brand}."
+            )
+
+        elif best_score >= 0.65:
+            signals.append(
+                f"Potential brand similarity detected: {best_brand}."
+            )
+
+    # Brand hidden inside a larger domain name.
+    for brand in MONITORED_BRANDS:
+
+        if (
+            brand.lower() in main_domain
+            and main_domain != brand.lower()
+        ):
+            signals.append(
+                f"Brand name appears inside domain: {brand}."
+            )
+
+            best_brand = brand
+            best_score = max(
+                best_score,
+                0.72,
+            )
+
+    return {
+        "score": round(
+            min(best_score, 1.0),
+            3,
+        ),
+        "matched_brand": best_brand,
+        "signals": list(dict.fromkeys(signals)),
+    }
+
+
+def advanced_url_obfuscation(target_url: str) -> list[str]:
+    """
+    Detect additional suspicious URL structures.
+    """
+
+    findings = []
+
+    try:
+        parsed = urlparse(target_url)
+
+        hostname = (
+            parsed.hostname or ""
+        ).lower()
+
+        # Userinfo trick:
+        # https://trusted.com@evil.com
+        if parsed.username or parsed.password:
+            findings.append(
+                "URL contains username/password-style userinfo before the destination host."
+            )
+
+        # Punycode / IDN domain.
+        if "xn--" in hostname:
+            findings.append(
+                "Domain contains punycode/IDN encoding."
+            )
+
+        # Numeric IP instead of normal domain.
+        try:
+            ipaddress.ip_address(hostname)
+
+            findings.append(
+                "URL uses a direct IP address instead of a domain name."
+            )
+
+        except ValueError:
+            pass
+
+        # Excessive subdomains.
+        labels = [
+            x for x in hostname.split(".")
+            if x
+        ]
+
+        if len(labels) >= 5:
+            findings.append(
+                "Domain contains many subdomain levels."
+            )
+
+        # Suspicious encoded characters.
+        if "%" in target_url:
+            findings.append(
+                "URL contains percent-encoded characters."
+            )
+
+        # Very long query.
+        if len(parsed.query) > 300:
+            findings.append(
+                "URL contains an unusually large query string."
+            )
+
+    except Exception:
+        pass
+
+    return list(
+        dict.fromkeys(findings)
+    )
+
+
+def build_domain_age_signal(
+    age_days: int | None,
+) -> float:
+    """
+    Convert real domain age into a novelty signal.
+
+    0.0 = established domain
+    1.0 = very new / unknown domain
+
+    Unknown age receives a neutral value rather than
+    automatically being treated as malicious.
+    """
+
+    if age_days is None:
+        return 0.0
+
+    if age_days <= 7:
+        return 1.0
+
+    if age_days <= 30:
+        return 0.85
+
+    if age_days <= 90:
+        return 0.65
+
+    if age_days <= 180:
+        return 0.45
+
+    if age_days <= 365:
+        return 0.25
+
+    return 0.05
 
 def detect_urgency(text: str) -> tuple[float, list[str]]:
     """
