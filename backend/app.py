@@ -990,14 +990,49 @@ async def scan_url(request: URLScanRequest):
 
     if not final_domain:
         final_domain = get_hostname(target_url)
+            # ------------------------------------------------------------
+    # ADVANCED URL INTELLIGENCE
+    # ------------------------------------------------------------
 
-    typo_score = calculate_typosquat(
-        final_domain
+    domain_intelligence = (
+        await get_domain_registration_age(
+            final_domain
+        )
+    )
+
+    advanced_typo = (
+        advanced_typosquat_analysis(
+            final_domain
+        )
+    )
+
+    advanced_obfuscation = (
+        advanced_url_obfuscation(
+            final_url
+        )
+    )
+
+    real_domain_age = (
+        domain_intelligence.get(
+            "age_days"
+        )
+    )
+
+    domain_novelty = (
+        build_domain_age_signal(
+            real_domain_age
+        )
+    )
+
+    typo_score = max(
+        calculate_typosquat(final_domain),
+        advanced_typo["score"],
     )
 
     tld_hit = detect_suspicious_tld(
         final_domain
     )
+
 
     urgency_score, urgency_matches = detect_urgency(
         target_url
