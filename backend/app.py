@@ -1032,7 +1032,10 @@ async def scan_url(request: URLScanRequest):
     tld_hit = detect_suspicious_tld(
         final_domain
     )
+typo_analysis = advanced_typosquat_analysis(final_domain)
+typo_score = typo_analysis["score"]
 
+tld_hit = detect_suspicious_tld(final_domain)
 
     urgency_score, urgency_matches = detect_urgency(
         target_url
