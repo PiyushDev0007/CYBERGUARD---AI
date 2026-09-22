@@ -1041,6 +1041,9 @@ async def scan_url(request: URLScanRequest):
 
     if not final_domain:
         final_domain = get_hostname(target_url)
+        domain_age_days, registration_date, age_source = (
+    await get_domain_registration_age(final_domain)
+        )
             # ------------------------------------------------------------
     # ADVANCED URL INTELLIGENCE
     # ------------------------------------------------------------
