@@ -411,7 +411,58 @@ def detect_url_obfuscation(target_url: str) -> list[str]:
 # ============================================================
 # ADVANCED URL INTELLIGENCE
 # ============================================================
+async def get_domain_registration_age(domain: str):
+    """
+    Fetch domain registration information using RDAP.
+    Returns:
+        age_days, registration_date, source
+    """
+    if not domain:
+        return None, None, "unavailable"
 
+    try:
+        import httpx
+        from datetime import datetime, timezone
+
+        rdap_url = f"https://rdap.org/domain/{domain}"
+
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            response = await client.get(
+                rdap_url,
+                headers={
+                    "Accept": "application/rdap+json"
+                },
+            )
+
+        if response.status_code != 200:
+            return None, None, "rdap_unavailable"
+
+        data = response.json()
+
+        registration_date = None
+
+        for event in data.get("events", []):
+            if event.get("eventAction") == "registration":
+                registration_date = event.get("eventDate")
+                break
+
+        if not registration_date:
+            return None, None, "registration_date_unavailable"
+
+        registered_at = datetime.fromisoformat(
+            registration_date.replace("Z", "+00:00")
+        )
+
+        age_days = (
+            datetime.now(timezone.utc) - registered_at
+        ).days
+
+        age_days = max(0, age_days)
+
+        return age_days, registration_date, "rdap.org"
+
+    except Exception:
+        return None, None, "rdap_error"
 async def get_domain_registration_age(domain: str):
     """
     Best-effort RDAP lookup for domain registration information.
