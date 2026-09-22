@@ -1113,8 +1113,11 @@ tld_hit = detect_suspicious_tld(final_domain)
 
     signals = ThreatSignals(
         domain_age_days=(
-            0.9 if tld_hit else 0.2
-        ),
+    0.9 if domain_age_days is not None and domain_age_days < 30
+    else 0.6 if domain_age_days is not None and domain_age_days < 90
+    else 0.3 if domain_age_days is not None and domain_age_days < 365
+    else 0.1
+),
 
         redirect_hops=len(chain),
 
