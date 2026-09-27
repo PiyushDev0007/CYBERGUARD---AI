@@ -2,1637 +2,473 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="CYBERGUARD X — AI-powered multi-signal cyber threat, phishing and digital scam detection platform."
-    >
-
-    <meta
-        name="theme-color"
-        content="#050816"
-    >
-
-    <title>CYBERGUARD X | Cyber Threat Intelligence Platform</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CYBERGUARD X — AI-powered cyber threat detection, intelligence, explainable risk analysis and security investigation console.">
+    <meta name="theme-color" content="#05070B">
+    <meta name="color-scheme" content="dark">
+    <title>CYBERGUARD X | Threat Intelligence Console</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <!-- =========================================================
-     BACKGROUND EFFECTS
-     ========================================================= -->
+     CYBERGUARD X — PROFESSIONAL SOC CONSOLE
+     This HTML preserves the existing JavaScript DOM contracts.
+     ========================================================== -->
 
-<div class="background-grid" aria-hidden="true"></div>
-<div class="background-glow glow-one" aria-hidden="true"></div>
-<div class="background-glow glow-two" aria-hidden="true"></div>
+<div class="app-background" aria-hidden="true">
+    <div class="background-grid"></div>
+    <div class="background-noise"></div>
+    <div class="background-glow glow-primary"></div>
+    <div class="background-glow glow-secondary"></div>
+</div>
 
+<div class="app-shell" id="appShell">
 
-<!-- =========================================================
-     APPLICATION SHELL
-     ========================================================= -->
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+        <div class="sidebar-top">
+            <a class="brand" href="#overview" aria-label="CYBERGUARD X home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M24 4 40 10v11c0 10.5-6.3 18.8-16 23C14.3 39.8 8 31.5 8 21V10L24 4Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="m16 23 5 5 11-12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="brand-copy">
+                    <strong>CYBERGUARD</strong><em>X</em>
+                </span>
+            </a>
 
-<div class="app-shell">
-
-
-    <!-- =====================================================
-         SIDEBAR
-         ===================================================== -->
-
-    <aside class="sidebar" id="sidebar">
-
-        <div class="brand">
-
-            <div class="brand-icon">
-                🛡️
+            <div class="workspace-switcher">
+                <span class="workspace-dot"></span>
+                <span class="workspace-copy"><small>WORKSPACE</small><strong>Security Operations</strong></span>
+                <span class="workspace-chevron" aria-hidden="true">▾</span>
             </div>
 
-            <div class="brand-text">
-                <strong>CYBERGUARD</strong>
-                <span>X</span>
-            </div>
+            <nav class="sidebar-nav" aria-label="Security console">
+                <div class="nav-group">
+                    <span class="nav-group-label">OPERATIONS</span>
 
-        </div>
-
-
-        <div class="sidebar-label">
-            SECURITY CONSOLE
-        </div>
-
-
-        <nav class="sidebar-nav" aria-label="Main navigation">
-
-            <a
-                href="#overview"
-                class="nav-item active"
-                data-section="overview"
-            >
-                <span class="nav-icon">◈</span>
-                <span>Overview</span>
-            </a>
-
-            <a
-                href="#scanner"
-                class="nav-item"
-                data-section="scanner"
-            >
-                <span class="nav-icon">⌕</span>
-                <span>Threat Scanner</span>
-            </a>
-
-            <a
-                href="#analysis"
-                class="nav-item"
-                data-section="analysis"
-            >
-                <span class="nav-icon">◉</span>
-                <span>Analysis</span>
-            </a>
-
-            <a
-                href="#history"
-                class="nav-item"
-                data-section="history"
-            >
-                <span class="nav-icon">◷</span>
-                <span>Scan History</span>
-            </a>
-
-        </nav>
-
-
-        <div class="sidebar-label">
-            INTELLIGENCE
-        </div>
-
-
-        <nav class="sidebar-nav">
-
-            <a href="#threat-intelligence" class="nav-item">
-                <span class="nav-icon">◎</span>
-                <span>Threat Intel</span>
-            </a>
-
-            <a href="#xai" class="nav-item">
-                <span class="nav-icon">✦</span>
-                <span>Explainable AI</span>
-            </a>
-
-        </nav>
-
-
-        <!-- System Status -->
-
-        <div class="sidebar-status">
-
-            <div class="status-heading">
-                <span class="status-dot online"></span>
-                SYSTEM ONLINE
-            </div>
-
-            <p>
-                Detection services operational
-            </p>
-
-            <div class="status-mini-grid">
-
-                <div>
-                    <span>API</span>
-                    <strong id="apiStatus">ONLINE</strong>
+                    <a href="#overview" class="nav-item active" data-section="overview">
+                        <span class="nav-symbol">◈</span><span class="nav-label">Overview</span><span class="nav-shortcut">01</span>
+                    </a>
+                    <a href="#scanner" class="nav-item" data-section="scanner">
+                        <span class="nav-symbol">⌁</span><span class="nav-label">Threat Scanner</span><span class="nav-shortcut">02</span>
+                    </a>
+                    <a href="#analysis" class="nav-item" data-section="analysis">
+                        <span class="nav-symbol">◎</span><span class="nav-label">Analysis</span><span class="nav-shortcut">03</span>
+                    </a>
+                    <a href="#history" class="nav-item" data-section="history">
+                        <span class="nav-symbol">◷</span><span class="nav-label">Scan History</span><span class="nav-shortcut">04</span>
+                    </a>
                 </div>
 
-                <div>
-                    <span>ENGINE</span>
-                    <strong id="engineStatus">READY</strong>
+                <div class="nav-group">
+                    <span class="nav-group-label">INTELLIGENCE</span>
+                    <a href="#threat-intelligence" class="nav-item">
+                        <span class="nav-symbol">◉</span><span class="nav-label">Threat Intelligence</span>
+                    </a>
+                    <a href="#xai" class="nav-item">
+                        <span class="nav-symbol">✦</span><span class="nav-label">Explainable AI</span>
+                    </a>
                 </div>
 
+                <div class="nav-group">
+                    <span class="nav-group-label">PLATFORM</span>
+                    <a href="#architecture" class="nav-item">
+                        <span class="nav-symbol">⌘</span><span class="nav-label">Detection Pipeline</span>
+                    </a>
+                    <a href="#security-notice" class="nav-item">
+                        <span class="nav-symbol">✓</span><span class="nav-label">Security Controls</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="system-status-panel">
+                <div class="system-status-top">
+                    <div class="system-live"><span class="live-dot"></span><span>PLATFORM STATUS</span></div>
+                    <span class="status-caption">LIVE</span>
+                </div>
+                <strong class="system-status-title">Detection services operational</strong>
+                <div class="system-health-grid">
+                    <div class="health-cell"><span>API</span><strong id="apiStatus">ONLINE</strong></div>
+                    <div class="health-cell"><span>AI ENGINE</span><strong id="engineStatus">READY</strong></div>
+                </div>
             </div>
-
+            <div class="sidebar-meta"><span>CYBERGUARD X</span><span>v1.0</span></div>
         </div>
-
-
-        <div class="sidebar-footer">
-            <span>CYBERGUARD X</span>
-            <span>v1.0</span>
-        </div>
-
     </aside>
 
-
-    <!-- =====================================================
-         MAIN APPLICATION
-         ===================================================== -->
-
+    <!-- MAIN -->
     <div class="main-wrapper">
 
-
-        <!-- =================================================
-             TOP NAVBAR
-             ================================================= -->
-
+        <!-- TOPBAR -->
         <header class="topbar">
-
-            <button
-                type="button"
-                class="mobile-menu-btn"
-                id="mobileMenuBtn"
-                aria-label="Open navigation"
-            >
-                ☰
-            </button>
-
-
-            <div class="topbar-title">
-
-                <span class="eyebrow">
-                    SECURITY OPERATIONS CENTER
-                </span>
-
-                <h1>
-                    Threat Intelligence Console
-                </h1>
-
-            </div>
-
-
-            <div class="topbar-actions">
-
-                <div class="live-indicator">
-                    <span class="status-dot online"></span>
-                    <span>Live Protection</span>
+            <div class="topbar-left">
+                <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-controls="sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="breadcrumb">
+                    <span>SECURITY CONSOLE</span><span class="breadcrumb-separator">/</span><strong>Threat Intelligence</strong>
                 </div>
-
-                <button
-                    type="button"
-                    class="icon-btn"
-                    id="refreshBtn"
-                    title="Refresh"
-                    aria-label="Refresh dashboard"
-                >
-                    ↻
-                </button>
-
-                <button
-                    type="button"
-                    class="profile-btn"
-                    id="profileBtn"
-                    aria-label="User profile"
-                >
-                    <span class="profile-avatar">U</span>
-                    <span class="profile-name">Security User</span>
-                </button>
-
             </div>
 
+            <div class="topbar-right">
+                <div class="console-state"><span class="live-dot"></span><span>Live Protection</span></div>
+                <div class="topbar-divider"></div>
+
+                <button type="button" class="topbar-icon-button" id="refreshBtn" title="Refresh dashboard" aria-label="Refresh dashboard">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.8-4L3 10m0-4v4h4M4 13a8 8 0 0 0 14.8 4L21 14m0 4v-4h-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+
+                <button type="button" class="topbar-icon-button" title="Notifications" aria-label="Notifications">
+                    <span class="notification-indicator"></span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </button>
+
+                <button type="button" class="profile-btn" id="profileBtn" aria-label="Open security user profile" aria-haspopup="dialog">
+                    <span class="profile-avatar">U</span>
+                    <span class="profile-copy"><strong>Security User</strong><small>Analyst</small></span>
+                    <span class="profile-chevron" aria-hidden="true">▾</span>
+                </button>
+            </div>
         </header>
 
-
-        <!-- =================================================
-             MAIN CONTENT
-             ================================================= -->
-
+        <!-- CONTENT -->
         <main class="content">
 
-
-            <!-- =================================================
-                 HERO / OVERVIEW
-                 ================================================= -->
-
-            <section
-                id="overview"
-                class="hero-section"
-            >
-
-                <div class="hero-content">
-
-                    <div class="hero-badge">
-                        <span class="pulse-dot"></span>
-                        AI-POWERED THREAT DETECTION
+            <!-- HERO -->
+            <section id="overview" class="hero-section page-section" data-page-section="overview">
+                <div class="hero-grid">
+                    <div class="hero-copy">
+                        <div class="eyebrow-row">
+                            <span class="eyebrow">AI-POWERED CYBER DEFENSE</span>
+                            <span class="eyebrow-status"><span class="live-dot"></span>ENGINE ACTIVE</span>
+                        </div>
+                        <h1>Detect the signal.<span>Understand the threat.</span></h1>
+                        <p class="hero-description">CYBERGUARD X combines threat detection, URL forensics, intelligence enrichment, AI risk scoring and explainable analysis in one security operations workspace.</p>
+                        <div class="hero-actions">
+                            <a href="#scanner" class="button button-primary"><span>Start security scan</span><span class="button-arrow">→</span></a>
+                            <a href="#architecture" class="button button-ghost"><span>Explore the platform</span></a>
+                        </div>
+                        <div class="hero-trust-row">
+                            <span><span class="trust-check">✓</span>Multi-signal analysis</span>
+                            <span><span class="trust-check">✓</span>Explainable risk</span>
+                            <span><span class="trust-check">✓</span>Forensic context</span>
+                        </div>
                     </div>
 
-                    <h2>
-                        Detect threats before
-                        <span>they become incidents.</span>
-                    </h2>
+                    <div class="hero-visual" aria-label="CYBERGUARD X detection engine visualization">
+                        <div class="hero-visual-grid"></div>
+                        <div class="signal-orbit orbit-one"></div>
+                        <div class="signal-orbit orbit-two"></div>
+                        <div class="signal-orbit orbit-three"></div>
+                        <div class="signal-node node-a"><span class="node-pulse"></span>URL</div>
+                        <div class="signal-node node-b"><span class="node-pulse"></span>QR</div>
+                        <div class="signal-node node-c"><span class="node-pulse"></span>NLP</div>
 
-                    <p>
-                        CYBERGUARD X combines security rules, AI-based
-                        risk scoring, threat intelligence and explainable
-                        analysis into one unified security platform.
-                    </p>
-
-
-                    <div class="hero-actions">
-
-                        <a
-                            href="#scanner"
-                            class="primary-action"
-                        >
-                            <span>⌕</span>
-                            Start Security Scan
-                        </a>
-
-                        <a
-                            href="#analysis"
-                            class="secondary-action"
-                        >
-                            View Analysis
-                            <span>→</span>
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <div class="hero-visual">
-
-                    <div class="radar-container">
-
-                        <div class="radar-circle circle-one"></div>
-                        <div class="radar-circle circle-two"></div>
-                        <div class="radar-circle circle-three"></div>
-
-                        <div class="radar-sweep"></div>
-
-                        <div class="radar-center">
-                            <span>CG</span>
+                        <div class="signal-core">
+                            <div class="core-ring"></div>
+                            <div class="core-content"><span class="core-label">CYBERGUARD</span><strong>X</strong><small>ANALYSIS ENGINE</small></div>
                         </div>
 
-                        <div class="radar-point point-one"></div>
-                        <div class="radar-point point-two"></div>
-                        <div class="radar-point point-three"></div>
-
+                        <div class="hero-telemetry">
+                            <span class="telemetry-line"><span>THREAT SIGNALS</span><strong>ACTIVE</strong></span>
+                            <span class="telemetry-line"><span>RISK ENGINE</span><strong>READY</strong></span>
+                            <span class="telemetry-line"><span>INTELLIGENCE</span><strong>CONNECTED</strong></span>
+                        </div>
                     </div>
-
-                    <div class="hero-visual-label">
-                        <span class="status-dot online"></span>
-                        MULTI-SIGNAL ENGINE ACTIVE
-                    </div>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 METRIC CARDS
-                 ================================================= -->
-
-            <section
-                class="metric-grid"
-                aria-label="Security statistics"
-            >
-
-                <article class="metric-card">
-
-                    <div class="metric-icon blue">
-                        ⌕
-                    </div>
-
-                    <div class="metric-data">
-                        <span>Total Scans</span>
-                        <strong id="totalScans">--</strong>
-                    </div>
-
-                    <span class="metric-trend">
-                        ALL TIME
-                    </span>
-
-                </article>
-
-
-                <article class="metric-card">
-
-                    <div class="metric-icon red">
-                        ⚠
-                    </div>
-
-                    <div class="metric-data">
-                        <span>Threats Detected</span>
-                        <strong id="threatsDetected">--</strong>
-                    </div>
-
-                    <span class="metric-trend danger">
-                        THREATS
-                    </span>
-
-                </article>
-
-
-                <article class="metric-card">
-
-                    <div class="metric-icon green">
-                        ✓
-                    </div>
-
-                    <div class="metric-data">
-                        <span>Low Risk</span>
-                        <strong id="lowRiskCount">--</strong>
-                    </div>
-
-                    <span class="metric-trend safe">
-                        LOW RISK
-                    </span>
-
-                </article>
-
-
-                <article class="metric-card">
-
-                    <div class="metric-icon purple">
-                        ◉
-                    </div>
-
-                    <div class="metric-data">
-                        <span>AI Engine</span>
-                        <strong>READY</strong>
-                    </div>
-
-                    <span class="metric-trend">
-                        LIGHTGBM
-                    </span>
-
-                </article>
-
+            <!-- LIVE STRIP -->
+            <section class="platform-strip" aria-label="Security platform status">
+                <div class="platform-strip-label"><span class="live-dot"></span><span>LIVE PLATFORM SNAPSHOT</span></div>
+                <div class="platform-strip-item"><span>Detection</span><strong>Operational</strong></div>
+                <div class="platform-strip-item"><span>AI Risk Engine</span><strong>Ready</strong></div>
+                <div class="platform-strip-item"><span>Threat Intel</span><strong>Integrated</strong></div>
+                <div class="platform-strip-item"><span>Analysis Mode</span><strong>Multi-signal</strong></div>
             </section>
 
+            <!-- METRICS -->
+            <section class="metrics-grid" aria-label="Platform metrics">
+                <article class="metric-card metric-card-accent">
+                    <div class="metric-top"><span class="metric-kicker">SCAN ACTIVITY</span><span class="metric-code">01</span></div>
+                    <div class="metric-value-row"><strong id="totalScans">--</strong><span class="metric-unit">TOTAL SCANS</span></div>
+                    <div class="metric-footer">All recorded security assessments</div>
+                </article>
 
-            <!-- =================================================
-                 THREAT SCANNER
-                 ================================================= -->
+                <article class="metric-card">
+                    <div class="metric-top"><span class="metric-kicker">THREAT DETECTION</span><span class="metric-code danger-code">02</span></div>
+                    <div class="metric-value-row"><strong id="threatsDetected">--</strong><span class="metric-unit">DETECTED</span></div>
+                    <div class="metric-footer">Elevated or suspicious assessments</div>
+                </article>
 
-            <section
-                id="scanner"
-                class="dashboard-section scanner-section"
-            >
+                <article class="metric-card">
+                    <div class="metric-top"><span class="metric-kicker">LOW RISK</span><span class="metric-code safe-code">03</span></div>
+                    <div class="metric-value-row"><strong id="lowRiskCount">--</strong><span class="metric-unit">ASSESSMENTS</span></div>
+                    <div class="metric-footer">Lower-risk outcomes in the dataset</div>
+                </article>
 
-                <div class="section-heading">
+                <article class="metric-card metric-card-engine">
+                    <div class="metric-top"><span class="metric-kicker">AI RISK ENGINE</span><span class="engine-live-badge">READY</span></div>
+                    <div class="engine-metric"><span class="engine-status-ring"><span></span></span><div><strong>LightGBM</strong><span>Explainable scoring pipeline</span></div></div>
+                    <div class="metric-footer">Multi-signal security assessment</div>
+                </article>
+            </section>
 
-                    <div>
-                        <span class="section-kicker">
-                            ANALYSIS CENTER
-                        </span>
-
-                        <h2>
-                            Threat Scanner
-                        </h2>
-
-                        <p>
-                            Analyze URLs, messages and QR codes using
-                            multiple security signals.
-                        </p>
-                    </div>
-
-                    <div class="scanner-status">
-                        <span class="status-dot online"></span>
-                        SCANNER READY
-                    </div>
-
+            <!-- SCANNER -->
+            <section id="scanner" class="dashboard-section scanner-section page-section" data-page-section="scanner">
+                <div class="section-header">
+                    <div><span class="section-kicker">02 / ANALYSIS CENTER</span><h2>Threat Scanner</h2><p>Submit a URL, message, SMS/email sample or QR image for multi-layer security analysis.</p></div>
+                    <div class="section-state"><span class="live-dot"></span>SCANNER READY</div>
                 </div>
 
-
-                <div class="scanner-card">
-
-
-                    <!-- Scanner tabs -->
-
-                    <div class="scanner-tabs" role="tablist">
-
-                        <button
-                            type="button"
-                            class="scanner-tab active"
-                            data-scan-type="url"
-                            role="tab"
-                            aria-selected="true"
-                        >
-                            <span>🌐</span>
-                            URL Scan
-                        </button>
-
-                        <button
-                            type="button"
-                            class="scanner-tab"
-                            data-scan-type="text"
-                            role="tab"
-                            aria-selected="false"
-                        >
-                            <span>✉</span>
-                            Message Scan
-                        </button>
-
-                        <button
-                            type="button"
-                            class="scanner-tab"
-                            data-scan-type="qr"
-                            role="tab"
-                            aria-selected="false"
-                        >
-                            <span>▦</span>
-                            QR Scan
-                        </button>
-
+                <div class="scanner-workspace">
+                    <div class="scanner-workspace-header">
+                        <div class="scanner-mode-copy"><div class="scanner-mode-mark">⌁</div><div><span>PRIMARY INPUT</span><strong>Analyze suspicious content</strong></div></div>
+                        <div class="scanner-capabilities"><span>URL</span><span>TEXT</span><span>QR</span><span>XAI</span></div>
                     </div>
 
-
-                    <!-- Scanner body -->
-
-                    <div class="scanner-body">
-
-
-                        <!-- Input panel -->
-
-                        <div class="input-panel">
-
-                            <div class="input-heading">
-
-                                <div>
-
-                                    <h3 id="scannerInputTitle">
-                                        Analyze a suspicious URL
-                                    </h3>
-
-                                    <p id="scannerInputDescription">
-                                        Enter a website URL to inspect its
-                                        structure, domain intelligence,
-                                        reputation and redirect behavior.
-                                    </p>
-
-                                </div>
-
-                                <span class="secure-label">
-                                    🔒 SECURE ANALYSIS
-                                </span>
-
+                    <div class="scanner-layout">
+                        <div class="scanner-input-column">
+                            <div class="input-meta-row">
+                                <div><label for="threatInput" class="input-label">Threat input</label><span class="input-helper">URL, SMS, email, message or suspicious text</span></div>
+                                <span class="secure-badge"><span>●</span>SECURE INPUT</span>
                             </div>
 
-
-                            <!-- Text / URL / Message Input -->
-
-                            <label
-                                for="threatInput"
-                                class="input-label"
-                            >
-                                Threat Input
-                            </label>
-
-                            <div class="textarea-wrapper">
-
-                                <textarea
-                                    id="threatInput"
-                                    rows="7"
-                                    placeholder="https://example.com/..."
-                                    autocomplete="off"
-                                    spellcheck="false"
-                                    aria-describedby="inputHint"
-                                ></textarea>
-
-                                <div class="textarea-footer">
-
-                                    <span id="inputHint">
-                                        Do not enter passwords, OTPs or
-                                        other sensitive credentials.
-                                    </span>
-
-                                    <span id="characterCount">
-                                        0 characters
-                                    </span>
-
-                                </div>
-
+                            <div class="input-shell">
+                                <textarea id="threatInput" rows="10" placeholder="Paste a suspicious URL or message here..." autocomplete="off" spellcheck="false" aria-describedby="inputHint"></textarea>
+                                <div class="input-shell-bottom"><span id="inputHint">Do not enter passwords, OTPs, payment credentials or other secrets.</span><span id="characterCount">0 characters</span></div>
                             </div>
 
-
-                            <!-- QR Upload -->
-
-                            <div
-                                class="qr-upload"
-                                id="qrUploadSection"
-                                hidden
-                            >
-
-                                <div class="upload-icon">
-                                    ▦
-                                </div>
-
-                                <div class="upload-content">
-
-                                    <strong>
-                                        Upload QR Code
-                                    </strong>
-
-                                    <p>
-                                        PNG, JPG or WEBP image
-                                    </p>
-
-                                </div>
-
-                                <label
-                                    for="qrFileInput"
-                                    class="upload-btn"
-                                >
-                                    Choose File
-                                </label>
-
-                                <input
-                                    type="file"
-                                    id="qrFileInput"
-                                    accept="image/png,image/jpeg,image/webp"
-                                    hidden
-                                >
-
+                            <div class="qr-intake" id="qrUploadSection">
+                                <div class="qr-intake-mark">▦</div>
+                                <div class="qr-intake-copy"><strong>Quishing / QR analysis</strong><span>Upload a QR image to inspect the encoded destination.</span></div>
+                                <label for="qrFileInput" class="qr-upload-button">Choose image</label>
+                                <input type="file" id="qrFileInput" accept="image/png,image/jpeg,image/webp" hidden>
+                                <span id="fileNameDisplay" class="file-name-display" aria-live="polite"></span>
                             </div>
 
-
-                            <div
-                                id="fileNameDisplay"
-                                class="file-name"
-                                aria-live="polite"
-                            ></div>
-
-
-                            <!-- Scan controls -->
-
-                            <div class="scanner-controls">
-
-                                <div class="scan-options">
-
-                                    <span class="option-label">
-                                        Analysis:
-                                    </span>
-
-                                    <span class="option-chip">
-                                        URL Intelligence
-                                    </span>
-
-                                    <span class="option-chip">
-                                        Threat Intel
-                                    </span>
-
-                                    <span class="option-chip">
-                                        XAI
-                                    </span>
-
-                                </div>
-
-
-                                <button
-                                    id="analyzeBtn"
-                                    class="analyze-btn"
-                                    type="button"
-                                >
-                                    <span class="btn-icon">⌕</span>
-                                    <span>Analyze Threat</span>
-                                    <span class="btn-arrow">→</span>
-                                </button>
-
+                            <div class="scanner-submit-row">
+                                <div class="analysis-stack"><span>Analysis stack</span><div class="analysis-stack-items"><span>Forensics</span><span>Threat Intel</span><span>AI Risk</span><span>XAI</span></div></div>
+                                <button type="button" id="analyzeBtn" class="scan-button"><span class="scan-button-icon">→</span><span>Analyze Threat</span><span class="scan-button-arrow">↗</span></button>
                             </div>
-
                         </div>
 
-
-                        <!-- Scanner information panel -->
-
-                        <aside class="scanner-info">
-
-                            <div class="info-header">
-                                <span class="info-icon">◈</span>
-                                <div>
-                                    <strong>Multi-Signal Analysis</strong>
-                                    <span>What CyberGuard X checks</span>
-                                </div>
+                        <aside class="scanner-intelligence">
+                            <div class="scanner-intelligence-header"><span class="section-kicker">DETECTION LOGIC</span><strong>Multi-signal analysis</strong><span>Context is built before a verdict is presented.</span></div>
+                            <div class="signal-stack">
+                                <div class="signal-row"><span class="signal-index">01</span><div><strong>Input normalization</strong><span>Parse target, protocol and observable context.</span></div><span class="signal-state">READY</span></div>
+                                <div class="signal-row"><span class="signal-index">02</span><div><strong>URL / content forensics</strong><span>Inspect structure, patterns and behavioral indicators.</span></div><span class="signal-state">READY</span></div>
+                                <div class="signal-row"><span class="signal-index">03</span><div><strong>Threat intelligence</strong><span>Enrich analysis with external reputation signals.</span></div><span class="signal-state">READY</span></div>
+                                <div class="signal-row"><span class="signal-index">04</span><div><strong>AI risk assessment</strong><span>Produce a 0–100 score with explainable factors.</span></div><span class="signal-state active">ACTIVE</span></div>
                             </div>
-
-
-                            <div class="signal-list">
-
-                                <div class="signal-item">
-                                    <span class="signal-number">01</span>
-                                    <div>
-                                        <strong>URL Structure</strong>
-                                        <span>Obfuscation &amp; suspicious patterns</span>
-                                    </div>
-                                </div>
-
-                                <div class="signal-item">
-                                    <span class="signal-number">02</span>
-                                    <div>
-                                        <strong>Domain Intelligence</strong>
-                                        <span>Registration &amp; DNS signals</span>
-                                    </div>
-                                </div>
-
-                                <div class="signal-item">
-                                    <span class="signal-number">03</span>
-                                    <div>
-                                        <strong>Threat Intelligence</strong>
-                                        <span>External reputation sources</span>
-                                    </div>
-                                </div>
-
-                                <div class="signal-item">
-                                    <span class="signal-number">04</span>
-                                    <div>
-                                        <strong>Behavior Analysis</strong>
-                                        <span>Redirect &amp; destination behavior</span>
-                                    </div>
-                                </div>
-
-                                <div class="signal-item">
-                                    <span class="signal-number">05</span>
-                                    <div>
-                                        <strong>AI Risk Engine</strong>
-                                        <span>LightGBM + explainable scoring</span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div class="security-note">
-
-                                <span>🛡️</span>
-
-                                <p>
-                                    Your input is analyzed through
-                                    security controls designed to reduce
-                                    unsafe requests and SSRF exposure.
-                                </p>
-
-                            </div>
-
+                            <div class="scanner-security-note"><span class="security-note-mark">!</span><p>Automated results are an assessment, not a guarantee. Always verify high-risk requests independently.</p></div>
                         </aside>
-
                     </div>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 SECURITY ANALYSIS
-                 ================================================= -->
-
-            <section
-                id="analysis"
-                class="dashboard-section"
-            >
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-kicker">
-                            AI SECURITY ASSESSMENT
-                        </span>
-
-                        <h2>
-                            Security Analysis
-                        </h2>
-
-                        <p>
-                            Unified risk assessment generated from
-                            multiple security signals.
-                        </p>
-                    </div>
-
-                    <span
-                        id="severityBadge"
-                        class="severity-badge standby"
-                    >
-                        STANDBY
-                    </span>
-
+            <!-- ANALYSIS -->
+            <section id="analysis" class="dashboard-section analysis-section page-section" data-page-section="analysis">
+                <div class="section-header">
+                    <div><span class="section-kicker">03 / SECURITY ASSESSMENT</span><h2>Risk Analysis</h2><p>Convert raw security signals into an explainable verdict.</p></div>
+                    <span id="severityBadge" class="badge">WAITING</span>
                 </div>
 
-
-                <div class="analysis-grid">
-
-
-                    <!-- Risk Score -->
-
-                    <article class="risk-card">
-
-                        <div class="risk-card-header">
-
-                            <div>
-                                <span class="card-kicker">
-                                    OVERALL RISK
-                                </span>
-
-                                <h3>
-                                    Threat Risk Score
-                                </h3>
-                            </div>
-
-                            <span class="risk-shield">
-                                🛡️
-                            </span>
-
+                <div class="analysis-dashboard">
+                    <article class="risk-score-panel">
+                        <div class="panel-topline"><div><span class="panel-kicker">OVERALL RISK</span><h3>Threat risk score</h3></div><span class="panel-code">RISK / 100</span></div>
+                        <div class="risk-score-main">
+                            <div class="risk-gauge" aria-hidden="true"><div class="risk-gauge-back"></div><div class="risk-gauge-core"><span class="risk-gauge-label">SCORE</span><strong id="riskScore">—</strong><span class="risk-gauge-unit">/ 100</span></div></div>
+                            <div class="risk-verdict"><span class="risk-verdict-label">CURRENT ASSESSMENT</span><strong id="threatStatus">No scan performed</strong><p>Run a scan to generate the current security assessment.</p></div>
                         </div>
-
-
-                        <div class="risk-score-container">
-
-                            <div
-                                class="risk-ring"
-                                id="riskRing"
-                            >
-
-                                <div class="risk-ring-inner">
-
-                                    <strong id="riskScoreValue">
-                                        --
-                                    </strong>
-
-                                    <span>
-                                        / 100
-                                    </span>
-
-                                </div>
-
+                        <div class="risk-meter-area">
+                            <div class="risk-meter-heading"><span>RISK DISTRIBUTION</span><span>0 — 100</span></div>
+                            <div class="meter-container" role="progressbar" aria-label="Threat risk score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="meterBar" class="meter-bar"></div></div>
+                            <div class="risk-scale">
+                                <span><i class="scale-dot low"></i>0–39 LOW</span>
+                                <span><i class="scale-dot medium"></i>40–69 MEDIUM</span>
+                                <span><i class="scale-dot high"></i>70–89 HIGH</span>
+                                <span><i class="scale-dot critical"></i>90–100 CRITICAL</span>
                             </div>
-
-
-                            <div class="risk-summary">
-
-                                <span
-                                    id="riskScore"
-                                    class="risk-score-text"
-                                    aria-live="polite"
-                                >
-                                    Risk Score: <strong>--/100</strong>
-                                </span>
-
-                                <div
-                                    id="threatStatus"
-                                    class="threat-status"
-                                    aria-live="polite"
-                                >
-                                    Waiting for analysis...
-                                </div>
-
-                            </div>
-
                         </div>
-
-
-                        <!-- Risk meter -->
-
-                        <div class="meter-section">
-
-                            <div class="meter-labels">
-                                <span>LOW</span>
-                                <span>MEDIUM</span>
-                                <span>HIGH</span>
-                                <span>CRITICAL</span>
-                            </div>
-
-                            <div
-                                class="meter-container"
-                                role="progressbar"
-                                aria-label="Threat risk score"
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                                aria-valuenow="0"
-                            >
-
-                                <div
-                                    id="meterBar"
-                                    class="meter-bar"
-                                ></div>
-
-                                <div class="meter-marker"></div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- Severity scale -->
-
-                        <div class="severity-scale">
-
-                            <div>
-                                <span class="scale-dot low"></span>
-                                <span>0–39</span>
-                                <strong>Low</strong>
-                            </div>
-
-                            <div>
-                                <span class="scale-dot medium"></span>
-                                <span>40–69</span>
-                                <strong>Medium</strong>
-                            </div>
-
-                            <div>
-                                <span class="scale-dot high"></span>
-                                <span>70–89</span>
-                                <strong>High</strong>
-                            </div>
-
-                            <div>
-                                <span class="scale-dot critical"></span>
-                                <span>90–100</span>
-                                <strong>Critical</strong>
-                            </div>
-
-                        </div>
-
                     </article>
 
-
-                    <!-- Explanation -->
-
-                    <article class="explanation-card">
-
-                        <div class="card-heading">
-
-                            <div class="card-heading-icon">
-                                ✦
-                            </div>
-
-                            <div>
-                                <span class="card-kicker">
-                                    XAI ENGINE
-                                </span>
-
-                                <h3>
-                                    Why this score?
-                                </h3>
-                            </div>
-
+                    <article class="explanation-panel">
+                        <div class="panel-topline"><div><span class="panel-kicker">EXPLAINABLE AI</span><h3>Why this result?</h3></div><span class="xai-chip">✦ XAI</span></div>
+                        <div id="explanation" class="explanation-content" aria-live="polite">
+                            <div class="analysis-empty"><div class="analysis-empty-icon">✦</div><strong>Awaiting security analysis</strong><p>Submit a target above to see the reasoning behind the score, including contributing indicators and model context.</p></div>
                         </div>
-
-
-                        <div
-                            id="explanation"
-                            class="explanation-content"
-                            aria-live="polite"
-                        >
-
-                            <div class="empty-state">
-
-                                <span class="empty-icon">
-                                    ✦
-                                </span>
-
-                                <strong>
-                                    Awaiting security analysis
-                                </strong>
-
-                                <p>
-                                    Run a scan to receive an explainable
-                                    assessment of the detected risk factors.
-                                </p>
-
-                            </div>
-
-                        </div>
-
+                        <div class="explanation-footer"><span>Model transparency</span><span>Signal contribution → verdict</span></div>
                     </article>
-
                 </div>
 
-
-                <!-- =================================================
-                     FORENSIC INDICATORS
-                     ================================================= -->
-
-                <div
-                    id="forensicsWrapper"
-                    class="forensics-section"
-                    hidden
-                >
-
-                    <div class="section-heading compact">
-
-                        <div>
-                            <span class="section-kicker">
-                                FORENSIC ANALYSIS
-                            </span>
-
-                            <h3>
-                                Detection Indicators
-                            </h3>
-                        </div>
-
-                        <span class="xai-label">
-                            ✦ EXPLAINABLE AI
-                        </span>
-
-                    </div>
-
-
+                <div id="forensicsWrapper" class="forensics-area" hidden>
+                    <div class="forensics-header"><div><span class="section-kicker">FORENSIC EVIDENCE</span><h3>Detection indicators</h3></div><span class="forensics-live">ANALYSIS COMPLETE</span></div>
                     <div class="forensics-grid">
-
-
-                        <!-- XAI factors -->
-
-                        <article
-                            class="forensics-card"
-                            id="xai"
-                        >
-
-                            <div class="forensics-card-header">
-
-                                <div>
-                                    <span class="forensics-icon purple">
-                                        ✦
-                                    </span>
-
-                                    <div>
-                                        <strong>
-                                            Risk Factors
-                                        </strong>
-
-                                        <span>
-                                            Contributing security signals
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <ul
-                                id="xaiList"
-                                class="xai-list"
-                            ></ul>
-
+                        <article id="xai" class="forensics-panel">
+                            <div class="forensics-panel-head"><div><span class="forensic-icon purple">✦</span><div><strong>Risk factors</strong><span>Contributing security signals</span></div></div></div>
+                            <ul id="xaiList" class="xai-list"></ul>
                         </article>
 
-
-                        <!-- Redirect Chain -->
-
-                        <article
-                            class="forensics-card"
-                            id="redirectAnalysis"
-                        >
-
-                            <div class="forensics-card-header">
-
-                                <div>
-                                    <span class="forensics-icon orange">
-                                        ↪
-                                    </span>
-
-                                    <div>
-                                        <strong>
-                                            Redirect Sequence
-                                        </strong>
-
-                                        <span>
-                                            URL navigation trace
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div
-                                id="hopChainWrapper"
-                                hidden
-                            >
-
-                                <div
-                                    id="hopChainLogs"
-                                    class="hop-chain"
-                                ></div>
-
-                            </div>
-
-
-                            <div
-                                id="redirectEmpty"
-                                class="mini-empty"
-                            >
-                                No redirect data available.
-                            </div>
-
+                        <article id="redirectAnalysis" class="forensics-panel">
+                            <div class="forensics-panel-head"><div><span class="forensic-icon orange">↪</span><div><strong>Redirect sequence</strong><span>URL navigation trace</span></div></div></div>
+                            <div id="hopChainWrapper" hidden><div id="hopChainLogs" class="hop-chain"></div></div>
+                            <div id="redirectEmpty" class="forensics-empty">No redirect data available.</div>
                         </article>
-
-
                     </div>
-
-
-                    <!-- Incident dossier -->
-
                     <div class="dossier-bar">
-
-                        <div class="dossier-info">
-
-                            <span class="dossier-icon">
-                                📋
-                            </span>
-
-                            <div>
-                                <strong>
-                                    Security Assessment Dossier
-                                </strong>
-
-                                <span>
-                                    Export the current analysis as
-                                    structured JSON evidence.
-                                </span>
-                            </div>
-
-                        </div>
-
-
-                        <button
-                            id="downloadReportBtn"
-                            class="secondary-btn"
-                            type="button"
-                        >
-                            <span>↓</span>
-                            Download JSON Report
-                        </button>
-
+                        <div class="dossier-copy"><span class="dossier-icon">⌁</span><div><strong>Security assessment dossier</strong><span>Export the current analysis as structured evidence.</span></div></div>
+                        <button type="button" id="downloadReportBtn" class="secondary-button"><span>↓</span>Download JSON report</button>
                     </div>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 THREAT INTELLIGENCE
-                 ================================================= -->
-
-            <section
-                id="threat-intelligence"
-                class="dashboard-section"
-            >
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-kicker">
-                            EXTERNAL INTELLIGENCE
-                        </span>
-
-                        <h2>
-                            Threat Intelligence
-                        </h2>
-
-                        <p>
-                            Supporting intelligence sources used during
-                            security analysis.
-                        </p>
-                    </div>
-
+            <!-- INTELLIGENCE -->
+            <section id="threat-intelligence" class="dashboard-section intelligence-section page-section">
+                <div class="section-header">
+                    <div><span class="section-kicker">04 / INTELLIGENCE LAYER</span><h2>Threat Intelligence</h2><p>Security context from integrated reputation, domain and AI analysis sources.</p></div>
+                    <span class="integration-status"><span class="live-dot"></span>INTEGRATED</span>
                 </div>
 
-
-                <div class="intel-grid">
-
-                    <article class="intel-card">
-
-                        <div class="intel-top">
-                            <div class="intel-logo vt">
-                                VT
-                            </div>
-
-                            <span class="intel-status">
-                                INTEGRATED
-                            </span>
-                        </div>
-
-                        <h3>
-                            VirusTotal
-                        </h3>
-
-                        <p>
-                            External reputation intelligence for
-                            suspicious indicators.
-                        </p>
-
+                <div class="intelligence-grid">
+                    <article class="intelligence-card">
+                        <div class="intelligence-card-top"><span class="source-mark vt">VT</span><span class="source-status">INTEGRATED</span></div>
+                        <span class="source-index">SOURCE 01</span><h3>VirusTotal</h3><p>External reputation intelligence for suspicious URLs and security indicators.</p>
+                        <div class="source-footer"><span>REPUTATION</span><span>↗</span></div>
                     </article>
-
-
-                    <article class="intel-card">
-
-                        <div class="intel-top">
-                            <div class="intel-logo rdap">
-                                RD
-                            </div>
-
-                            <span class="intel-status">
-                                INTEGRATED
-                            </span>
-                        </div>
-
-                        <h3>
-                            RDAP
-                        </h3>
-
-                        <p>
-                            Domain registration and registration-age
-                            intelligence.
-                        </p>
-
+                    <article class="intelligence-card">
+                        <div class="intelligence-card-top"><span class="source-mark rdap">RD</span><span class="source-status">INTEGRATED</span></div>
+                        <span class="source-index">SOURCE 02</span><h3>RDAP</h3><p>Domain registration and registration-age intelligence for investigation context.</p>
+                        <div class="source-footer"><span>DOMAIN DATA</span><span>↗</span></div>
                     </article>
-
-
-                    <article class="intel-card">
-
-                        <div class="intel-top">
-                            <div class="intel-logo dns">
-                                DNS
-                            </div>
-
-                            <span class="intel-status">
-                                INTEGRATED
-                            </span>
-                        </div>
-
-                        <h3>
-                            DNS Intelligence
-                        </h3>
-
-                        <p>
-                            DNS resolution and domain-level signals
-                            supporting the analysis pipeline.
-                        </p>
-
+                    <article class="intelligence-card">
+                        <div class="intelligence-card-top"><span class="source-mark dns">DNS</span><span class="source-status">INTEGRATED</span></div>
+                        <span class="source-index">SOURCE 03</span><h3>DNS Intelligence</h3><p>DNS resolution and domain-level signals supporting the analysis pipeline.</p>
+                        <div class="source-footer"><span>NETWORK SIGNALS</span><span>↗</span></div>
                     </article>
-
-
-                    <article class="intel-card">
-
-                        <div class="intel-top">
-                            <div class="intel-logo ai">
-                                AI
-                            </div>
-
-                            <span class="intel-status active">
-                                ACTIVE
-                            </span>
-                        </div>
-
-                        <h3>
-                            Risk Engine
-                        </h3>
-
-                        <p>
-                            LightGBM-based multi-signal risk scoring
-                            with explainable output.
-                        </p>
-
+                    <article class="intelligence-card featured">
+                        <div class="intelligence-card-top"><span class="source-mark ai">AI</span><span class="source-status active">ACTIVE</span></div>
+                        <span class="source-index">CORE ENGINE</span><h3>AI Risk Engine</h3><p>Multi-signal scoring foundation with explainable security output.</p>
+                        <div class="source-footer"><span>LIGHTGBM / XAI</span><span>↗</span></div>
                     </article>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 SCAN HISTORY
-                 ================================================= -->
-
-            <section
-                id="history"
-                class="dashboard-section"
-            >
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-kicker">
-                            SECURITY ACTIVITY
-                        </span>
-
-                        <h2>
-                            Recent Scan History
-                        </h2>
-
-                        <p>
-                            Review previous security assessments.
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        class="outline-btn"
-                        id="loadHistoryBtn"
-                    >
-                        ↻ Refresh History
-                    </button>
-
+            <!-- HISTORY -->
+            <section id="history" class="dashboard-section history-section page-section">
+                <div class="section-header">
+                    <div><span class="section-kicker">05 / SECURITY ACTIVITY</span><h2>Scan History</h2><p>Review previously recorded security assessments.</p></div>
+                    <button type="button" class="outline-button" id="loadHistoryBtn"><span>↻</span>Refresh history</button>
                 </div>
 
-
-                <div class="history-card">
-
+                <div class="history-panel">
+                    <div class="history-toolbar">
+                        <div class="history-toolbar-title"><span>ACTIVITY LOG</span><strong>Recent assessments</strong></div>
+                        <div class="history-filters"><span class="filter-chip active">All</span><span class="filter-chip">URL</span><span class="filter-chip">Text</span><span class="filter-chip">QR</span></div>
+                    </div>
                     <div class="history-table-wrapper">
-
                         <table class="history-table">
-
-                            <thead>
-
-                                <tr>
-                                    <th>TYPE</th>
-                                    <th>TARGET / INPUT</th>
-                                    <th>RISK</th>
-                                    <th>SEVERITY</th>
-                                    <th>DATE</th>
-                                    <th>STATUS</th>
-                                </tr>
-
-                            </thead>
-
+                            <thead><tr><th>TYPE</th><th>TARGET / INPUT</th><th>RISK</th><th>SEVERITY</th><th>DATE</th><th>STATUS</th></tr></thead>
                             <tbody id="historyTableBody">
-
-                                <tr class="empty-history">
-
-                                    <td colspan="6">
-
-                                        <div class="table-empty">
-
-                                            <span>◷</span>
-
-                                            <strong>
-                                                No scan history available
-                                            </strong>
-
-                                            <p>
-                                                Completed scans will appear here.
-                                            </p>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
+                                <tr class="empty-history"><td colspan="6"><div class="history-empty"><span class="history-empty-mark">◷</span><strong>No scan history available</strong><p>Completed assessments will appear here.</p></div></td></tr>
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 SECURITY ARCHITECTURE
-                 ================================================= -->
-
-            <section class="dashboard-section architecture-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <span class="section-kicker">
-                            DEFENSE PIPELINE
-                        </span>
-
-                        <h2>
-                            How CyberGuard X Works
-                        </h2>
-
-                        <p>
-                            Multiple security layers contribute to a
-                            single explainable verdict.
-                        </p>
-                    </div>
-
+            <!-- PIPELINE -->
+            <section id="architecture" class="dashboard-section architecture-section page-section">
+                <div class="section-header">
+                    <div><span class="section-kicker">06 / PLATFORM ARCHITECTURE</span><h2>Detect → Analyze → Explain → Respond</h2><p>Every scan moves through layered security controls before a verdict is presented.</p></div>
                 </div>
 
+                <div class="pipeline-card">
+                    <div class="pipeline-intro"><span class="pipeline-line-label">CYBERGUARD X DEFENSE PIPELINE</span><p>A unified path from raw input to an explainable risk decision.</p></div>
 
-                <div class="pipeline">
-
-                    <div class="pipeline-step">
-
-                        <div class="pipeline-icon">
-                            01
-                        </div>
-
-                        <strong>
-                            Input
-                        </strong>
-
-                        <span>
-                            URL · Text · QR
-                        </span>
-
+                    <div class="pipeline">
+                        <article class="pipeline-step active"><span class="pipeline-number">01</span><div class="pipeline-symbol">◇</div><strong>Detect</strong><span>URL · Message · QR</span></article>
+                        <div class="pipeline-connector">→</div>
+                        <article class="pipeline-step"><span class="pipeline-number">02</span><div class="pipeline-symbol">⌁</div><strong>Analyze</strong><span>Forensics · Rules</span></article>
+                        <div class="pipeline-connector">→</div>
+                        <article class="pipeline-step"><span class="pipeline-number">03</span><div class="pipeline-symbol">◉</div><strong>Enrich</strong><span>Intel · DNS · RDAP</span></article>
+                        <div class="pipeline-connector">→</div>
+                        <article class="pipeline-step"><span class="pipeline-number">04</span><div class="pipeline-symbol">✦</div><strong>Score</strong><span>AI Risk · XAI</span></article>
+                        <div class="pipeline-connector">→</div>
+                        <article class="pipeline-step final"><span class="pipeline-number">05</span><div class="pipeline-symbol">✓</div><strong>Respond</strong><span>Verdict · Report</span></article>
                     </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="pipeline-icon">
-                            02
-                        </div>
-
-                        <strong>
-                            Detection
-                        </strong>
-
-                        <span>
-                            Security Rules
-                        </span>
-
-                    </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="pipeline-icon">
-                            03
-                        </div>
-
-                        <strong>
-                            Intelligence
-                        </strong>
-
-                        <span>
-                            VT · RDAP · DNS
-                        </span>
-
-                    </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step">
-
-                        <div class="pipeline-icon">
-                            04
-                        </div>
-
-                        <strong>
-                            AI Engine
-                        </strong>
-
-                        <span>
-                            LightGBM + SHAP
-                        </span>
-
-                    </div>
-
-
-                    <div class="pipeline-line"></div>
-
-
-                    <div class="pipeline-step final">
-
-                        <div class="pipeline-icon">
-                            05
-                        </div>
-
-                        <strong>
-                            Verdict
-                        </strong>
-
-                        <span>
-                            Score · XAI · Severity
-                        </span>
-
-                    </div>
-
                 </div>
-
             </section>
 
-
-            <!-- =================================================
-                 DISCLAIMER
-                 ================================================= -->
-
-            <section class="disclaimer">
-
-                <div class="disclaimer-icon">
-                    !
+            <!-- SECURITY NOTICE -->
+            <section id="security-notice" class="security-notice">
+                <div class="security-notice-icon">!</div>
+                <div class="security-notice-copy">
+                    <span>SECURITY ASSESSMENT NOTICE</span>
+                    <strong>Automated security analysis requires human verification.</strong>
+                    <p>CYBERGUARD X provides risk assessment and supporting security context. Results are not a guarantee that content is safe or malicious. Never submit passwords, OTPs, payment credentials, recovery codes or other confidential secrets for analysis.</p>
                 </div>
-
-                <div>
-
-                    <strong>
-                        Security Assessment Notice
-                    </strong>
-
-                    <p>
-                        CYBERGUARD X provides automated security analysis
-                        and risk assessment. Results are not a guarantee
-                        that content is safe or malicious. Always verify
-                        sensitive requests independently and avoid sharing
-                        passwords, OTPs, payment credentials or other
-                        confidential information.
-                    </p>
-
-                </div>
-
+                <a href="#scanner" class="security-notice-action">Run a scan →</a>
             </section>
-
         </main>
 
-
-        <!-- =================================================
-             FOOTER
-             ================================================= -->
-
+        <!-- FOOTER -->
         <footer class="app-footer">
-
-            <div>
-
-                <strong>
-                    🛡️ CYBERGUARD X
-                </strong>
-
-                <span>
-                    Advanced Digital Threat Intelligence Platform
+            <div class="footer-brand">
+                <span class="footer-mark">
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M24 4 40 10v11c0 10.5-6.3 18.8-16 23C14.3 39.8 8 31.5 8 21V10L24 4Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="m16 23 5 5 11-12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </span>
-
+                <div><strong>CYBERGUARD X</strong><span>AI-powered cyber threat intelligence</span></div>
             </div>
-
-
-            <div class="footer-meta">
-
-                <span>
-                    Detection Engine: Online
-                </span>
-
-                <span>
-                    •
-                </span>
-
-                <span>
-                    Secure Console
-                </span>
-
+            <div class="footer-status">
+                <span><span class="live-dot"></span>Detection engine online</span>
+                <span>Secure console</span>
+                <span>© CYBERGUARD X</span>
             </div>
-
         </footer>
-
     </div>
-
 </div>
 
-
-<!-- =========================================================
-     LOADING OVERLAY
-     ========================================================= -->
-
-<div
-    id="loadingOverlay"
-    class="loading-overlay"
-    hidden
-    aria-live="polite"
-    aria-busy="true"
->
-
-    <div class="loading-box">
-
-        <div class="loading-spinner"></div>
-
-        <strong>
-            Analyzing Threat
-        </strong>
-
-        <span>
-            Running multi-signal security checks...
-        </span>
-
+<!-- LOADING -->
+<div id="loadingOverlay" class="loading-overlay" hidden aria-live="polite" aria-busy="true">
+    <div class="loading-panel">
+        <div class="loading-orbit"><span></span><span></span><span></span></div>
+        <span class="loading-kicker">CYBERGUARD X</span>
+        <strong>Analyzing threat</strong>
+        <p>Running multi-signal security checks...</p>
         <div class="loading-steps">
-
-            <span>URL Intelligence</span>
-            <span>Threat Intelligence</span>
-            <span>AI Risk Engine</span>
-
+            <span><i></i>URL Intelligence</span>
+            <span><i></i>Threat Intelligence</span>
+            <span><i></i>AI Risk Engine</span>
         </div>
-
     </div>
-
 </div>
 
+<!-- TOASTS -->
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-<!-- =========================================================
-     TOAST NOTIFICATIONS
-     ========================================================= -->
-
-<div
-    id="toastContainer"
-    class="toast-container"
-    aria-live="polite"
-    aria-atomic="true"
-></div>
-
-
-<!-- =========================================================
-     PROFILE MODAL
-     ========================================================= -->
-
-<div
-    id="profileModal"
-    class="modal"
-    hidden
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="profileModalTitle"
->
-
+<!-- PROFILE -->
+<div id="profileModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
     <div class="modal-backdrop"></div>
-
     <div class="modal-card">
-
-        <button
-            type="button"
-            class="modal-close"
-            id="closeProfileModal"
-            aria-label="Close profile"
-        >
-            ×
-        </button>
-
-        <div class="modal-avatar">
-            U
-        </div>
-
-        <span class="section-kicker">
-            ACCOUNT
-        </span>
-
-        <h2 id="profileModalTitle">
-            Security User
-        </h2>
-
-        <p id="profileEmail">
-            Authenticated CyberGuard X user
-        </p>
-
-        <div class="profile-status">
-            <span class="status-dot online"></span>
-            Authentication active
-        </div>
-
+        <button type="button" class="modal-close" id="closeProfileModal" aria-label="Close profile">×</button>
+        <div class="modal-avatar">U</div>
+        <span class="section-kicker">SECURITY USER</span>
+        <h2 id="profileModalTitle">Security User</h2>
+        <p id="profileEmail">Authenticated CYBERGUARD X analyst</p>
+        <div class="profile-status"><span class="live-dot"></span>Authentication active</div>
     </div>
-
 </div>
-
-
-<!-- =========================================================
-     APPLICATION JAVASCRIPT
-     ========================================================= -->
 
 <script src="script.js"></script>
-
 </body>
 </html>
