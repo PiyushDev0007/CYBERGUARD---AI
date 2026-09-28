@@ -1,4 +1,4 @@
-"""
+""        values: Mapping[str, A"
 CYBERGUARD X — Scan Service Layer
 
 Responsibilities
@@ -165,7 +165,7 @@ class ScanRepository(Protocol):
     async def update_scan(
         self,
         scan_id: str,
-        values: Mapping[str, Any],
+ny],
     ) -> Any:
         ...
 
@@ -2260,7 +2260,39 @@ if __name__ == "__main__":
                 default=str,
             )
         )
-
-    asyncio.run(
-        demo()
+async def demo():
+    repository = InMemoryScanRepository()
+    service = ScanService(
+        repository=repository,
+        risk_evaluator=demo_risk_evaluator,
+        threat_intelligence_checker=demo_intelligence,
     )
+
+    result = await service.run_url_scan(
+        "https://example.com",
+        DemoSignals(),
+        metadata={"test": True},
+        trace={
+            "original_url": "https://example.com",
+            "final_url": "https://example.com",
+            "hops": [],
+        },
+        threat_intelligence=True,
+    )
+
+    print("\nCYBERGUARD X Scan Service Test")
+    print("==============================")
+    print(json.dumps(result, indent=2, default=str))
+
+    print("\nHistory:")
+    history = await service.list_history()
+    print(json.dumps(history, indent=2, default=str))
+
+    print("\nStatistics:")
+    statistics = await service.get_statistics()
+    print(json.dumps(statistics, indent=2, default=str))
+
+
+if __name__ == "__main__":
+    asyncio.run(demo())
+    
