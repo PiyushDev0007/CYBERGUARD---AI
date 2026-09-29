@@ -76,7 +76,7 @@ except ImportError:
 # ============================================================
 
 try:
-    from config import settings
+    from backend.config import settings
 except ImportError as exc:
     raise RuntimeError(
         "Could not import 'settings' from config.py. "
@@ -90,7 +90,7 @@ except ImportError as exc:
 # ============================================================
 
 try:
-    import database
+    from backend import database
 except ImportError as exc:
     raise RuntimeError(
         "Could not import backend/database.py."
@@ -102,21 +102,21 @@ except ImportError as exc:
 # ============================================================
 
 try:
-    from routers.auth import router as auth_router
+    from backend.routers.auth import router as auth_router
 except ImportError as exc:
     raise RuntimeError(
         "Could not import routers.auth."
     ) from exc
 
 try:
-    from routers.scan import router as scan_router
+    from backend.routers.scan import router as scan_router
 except ImportError as exc:
     raise RuntimeError(
         "Could not import routers.scan."
     ) from exc
 
 try:
-    from routers.history import router as history_router
+    from backend.routers.history import router as history_router
 except ImportError as exc:
     raise RuntimeError(
         "Could not import routers.history."
