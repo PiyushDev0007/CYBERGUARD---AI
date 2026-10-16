@@ -12,7 +12,7 @@ Responsibilities:
     - Define URL/redirect/domain metadata
     - Define QR/text scan responses
     - Define database-facing scan summaries
-    - Keep app_upgraded-5.py thin and maintainable
+    - Define authentication schemas
 
 This module contains DATA CONTRACTS only.
 
@@ -35,6 +35,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import (
     BaseModel,
     ConfigDict,
+    EmailStr,
     Field,
     field_validator,
     model_validator,
@@ -281,9 +282,6 @@ class RiskFeatureValues(CyberGuardBaseModel):
 class XAIContribution(CyberGuardBaseModel):
     """
     Structured explainability item.
-
-    This allows the frontend to display XAI as structured data
-    rather than relying only on strings.
     """
 
     feature: str = Field(
@@ -362,11 +360,6 @@ class RiskAssessment(CyberGuardBaseModel):
 
     @model_validator(mode="after")
     def synchronize_scores(self) -> "RiskAssessment":
-        """
-        Keep score and risk_score consistent for frontend
-        compatibility.
-        """
-
         if self.score != self.risk_score:
             self.risk_score = self.score
 
@@ -547,13 +540,6 @@ class URLMetadata(CyberGuardBaseModel):
 class ThreatIntelProviderResult(CyberGuardBaseModel):
     """
     Result returned by an individual intelligence provider.
-
-    Examples:
-        VirusTotal
-        Google Safe Browsing
-        URLhaus
-        AbuseIPDB
-        custom internal feed
     """
 
     provider: str
@@ -781,23 +767,15 @@ class ScanResponse(CyberGuardBaseModel):
 
     @model_validator(mode="after")
     def derive_verdict(self) -> "ScanResponse":
-        """
-        Derive a stable verdict from severity when a caller
-        did not explicitly provide one.
-        """
-
         if self.assessment is not None:
             severity = self.assessment.severity
 
             if severity == Severity.CRITICAL:
                 self.verdict = Verdict.MALICIOUS
-
             elif severity == Severity.HIGH:
                 self.verdict = Verdict.MALICIOUS
-
             elif severity == Severity.MEDIUM:
                 self.verdict = Verdict.SUSPICIOUS
-
             elif severity == Severity.LOW:
                 self.verdict = Verdict.SAFE
 
@@ -859,8 +837,6 @@ class QRScanResponse(ScanResponse):
 class ScanRecord(CyberGuardBaseModel):
     """
     Database/API representation of a completed scan.
-
-    This intentionally avoids storing raw uploaded files.
     """
 
     scan_id: str
@@ -1217,6 +1193,144 @@ class CapabilityResponse(CyberGuardBaseModel):
 
 
 # ============================================================
+# AUTHENTICATION SCHEMAS
+# ============================================================
+
+
+class UserCreate(BaseModel):
+    """
+    User registration request.
+
+    Used by:
+        POST /auth/register
+    """
+
+    email: EmailStr = Field(
+        ...,
+        description="User email address.",
+    )
+
+    password: str = Field(
+        ...,
+        min_length=8,
+        max_length=72,
+        description="Password (minimum 8 characters).",
+    )
+
+    name: Optional[str] = Field(
+        default=None,
+        max_length=120,
+        description="Optional display name.",
+    )
+
+
+class UserLogin(BaseModel):
+    """
+    User login request.
+
+    Used by:
+        POST /auth/login
+    """
+
+    email: EmailStr = Field(
+        ...,
+        description="User email address.",
+    )
+
+    password: str = Field(
+        ...,
+        min_length=1,
+        max_length=72,
+        description="User password.",
+    )
+
+
+class UserResponse(BaseModel):
+    """
+    Safe public user representation.
+
+    Password hash is never included.
+    """
+
+    id: str = Field(
+        ...,
+        description="User identifier.",
+    )
+
+    email: str = Field(
+        ...,
+        description="User email address.",
+    )
+
+    name: Optional[str] = Field(
+        default=None,
+        description="Display name.",
+    )
+
+    is_active: bool = Field(
+        default=True,
+        description="Whether the account is active.",
+    )
+
+    created_at: Optional[str] = Field(
+        default=None,
+        description="Account creation timestamp.",
+    )
+
+    last_login_at: Optional[str] = Field(
+        default=None,
+        description="Last successful login timestamp.",
+    )
+
+
+class TokenResponse(BaseModel):
+    """
+    JWT access token response.
+
+    Returned by:
+        POST /auth/login
+    """
+
+    access_token: str = Field(
+        ...,
+        description="JWT access token.",
+    )
+
+    token_type: str = Field(
+        default="bearer",
+        description="Token type.",
+    )
+
+    user: Optional[UserResponse] = Field(
+        default=None,
+        description="Authenticated user profile.",
+    )
+
+
+class ChangePasswordRequest(BaseModel):
+    """
+    Password change request.
+
+    Used by:
+        POST /auth/change-password
+    """
+
+    current_password: str = Field(
+        ...,
+        min_length=1,
+        max_length=72,
+        description="Current password.",
+    )
+
+    new_password: str = Field(
+        ...,
+        min_length=8,
+        max_length=72,
+        description="New password (minimum 8 characters).",
+    )
+
+
+# ============================================================
 # INTERNAL NORMALIZATION HELPERS
 # ============================================================
 
@@ -1227,8 +1341,6 @@ def assessment_from_dict(
     """
     Safely convert an existing risk_engine dictionary into the
     standardized RiskAssessment model.
-
-    Useful while migrating the existing backend.
     """
 
     payload = dict(data or {})
@@ -1389,6 +1501,13 @@ __all__ = [
     "BatchScanItem",
     "BatchScanResponse",
     "ScanJobStatus",
+
+    # Authentication
+    "UserCreate",
+    "UserLogin",
+    "UserResponse",
+    "TokenResponse",
+    "ChangePasswordRequest",
 
     # Helpers
     "assessment_from_dict",
