@@ -1,42 +1,26 @@
 """
-CYBERGUARD X — Database / Scan History Layer
+CYBERGUARD X — Database Layer
+==============================
 
-Responsibilities:
-    - Database configuration
-    - Scan-result persistence
-    - Scan history retrieval
-    - Scan lookup by scan_id
-    - Scan deletion
-    - Pagination
-    - Search/filter support
-    - JSON metadata/XAI/intelligence storage
-    - Database health checking
-    - SQLite development support
-    - PostgreSQL-ready configuration
+Provides:
+    - SQLAlchemy engine & session
+    - ScanRecord model (scan history)
+    - User model (authentication)
+    - Database initialization
+    - Health check
+    - CRUD helpers
 
-The scanner/risk engine should NOT contain database logic.
-app_upgraded-5.py should call this module after a scan completes.
-
-Environment variables:
-
-    DATABASE_URL=
-        Optional database URL.
-
-    Example SQLite:
-        sqlite:///./cyberguard.db
-
-    Example PostgreSQL:
-        postgresql+psycopg://user:password@localhost/cyberguard
-
-Default:
-    sqlite:///./cyberguard.db
+Compatible with:
+    - history_service.py
+    - auth_service.py
+    - scan_service.py
+    - main.py
 """
 
 from __future__ import annotations
 
 import json
 import logging
-import os
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -44,14 +28,13 @@ from pathlib import Path
 from typing import Any, Generator, Optional
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Float,
-    Index,
     Integer,
     String,
     Text,
     create_engine,
-    delete,
     func,
     select,
     text,
@@ -65,46 +48,45 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
+
 # ============================================================
 # LOGGING
 # ============================================================
 
 logger = logging.getLogger("cyberguard.database")
 
+
 # ============================================================
-# PROJECT PATH
+# CONFIGURATION
 # ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# ============================================================
-# DATABASE CONFIGURATION
-# ============================================================
+DEFAULT_DB_PATH = PROJECT_ROOT / "cyberguard.db"
 
-DEFAULT_DATABASE_URL = (
-    f"sqlite:///{PROJECT_ROOT / 'cyberguard.db'}"
-)
+import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    DEFAULT_DATABASE_URL,
+    f"sqlite:///{DEFAULT_DB_PATH}",
 ).strip()
 
-# SQLite needs this option when FastAPI requests use separate
-# worker threads.
+# SQLite needs this for FastAPI multithreading
 connect_args: dict[str, Any] = {}
 
 if DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 
+
 # ============================================================
-# SQLALCHEMY ENGINE
+# ENGINE + SESSION
 # ============================================================
 
 engine = create_engine(
     DATABASE_URL,
     connect_args=connect_args,
     pool_pre_ping=True,
+    echo=False,
 )
 
 SessionLocal = sessionmaker(
@@ -114,38 +96,29 @@ SessionLocal = sessionmaker(
     expire_on_commit=False,
 )
 
+
 # ============================================================
 # BASE MODEL
 # ============================================================
 
-
 class Base(DeclarativeBase):
-    """Base class for all CYBERGUARD X database models."""
+    """Base class for all CyberGuard X models."""
+    pass
 
 
 # ============================================================
-# UTILITY FUNCTIONS
+# HELPERS
 # ============================================================
-
 
 def utc_now() -> datetime:
-    """
-    Return timezone-aware UTC datetime.
-    """
+    """Return timezone-aware UTC datetime."""
     return datetime.now(timezone.utc)
 
 
 def json_dumps(value: Any) -> str:
-    """
-    Safely serialize Python data into JSON text.
-
-    Database columns use TEXT rather than database-specific JSON
-    types so SQLite and PostgreSQL can both use the same model.
-    """
-
+    """Safely serialize to JSON text."""
     if value is None:
         return "{}"
-
     try:
         return json.dumps(
             value,
@@ -158,51 +131,44 @@ def json_dumps(value: Any) -> str:
 
 
 def json_loads(value: Optional[str]) -> Any:
-    """
-    Safely deserialize JSON text.
-    """
-
+    """Safely deserialize JSON text."""
     if not value:
         return {}
-
     try:
         return json.loads(value)
     except (TypeError, ValueError, json.JSONDecodeError):
         return {}
 
 
-def normalize_string(
-    value: Any,
-    maximum_length: int = 10000,
-) -> str:
-    """
-    Convert arbitrary input to a safe bounded string.
-    """
-
+def normalize_string(value: Any, max_len: int = 10000) -> str:
+    """Convert to safe bounded string."""
     if value is None:
         return ""
-
     result = str(value).strip()
-
-    if len(result) > maximum_length:
-        result = result[:maximum_length]
-
+    if len(result) > max_len:
+        result = result[:max_len]
     return result
 
 
 # ============================================================
-# SCAN MODEL
+# SCAN RECORD MODEL (for history_service.py)
 # ============================================================
-
 
 class ScanRecord(Base):
     """
-    Persistent CYBERGUARD X scan record.
+    Persistent scan history record.
 
-    One row represents one completed scan.
-
-    Sensitive/raw input should only be stored when the application
-    explicitly chooses to retain it.
+    Matches the fields expected by history_service.py:
+        - scan_id
+        - scan_type
+        - input_value
+        - risk_score
+        - severity
+        - explanation
+        - xai (JSON text)
+        - metadata (JSON text)
+        - status
+        - created_at
     """
 
     __tablename__ = "scan_records"
@@ -220,20 +186,18 @@ class ScanRecord(Base):
         index=True,
     )
 
-    input_type: Mapped[str] = mapped_column(
+    scan_type: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
         index=True,
     )
 
-    # Original user-submitted input.
-    # This can contain a URL, message, or QR payload.
-    input_value: Mapped[str] = mapped_column(
+    input_value: Mapped[Optional[str]] = mapped_column(
         Text,
         nullable=True,
     )
 
-    # URL-specific information.
+    # URL-specific
     original_url: Mapped[Optional[str]] = mapped_column(
         Text,
         nullable=True,
@@ -250,11 +214,8 @@ class ScanRecord(Base):
         index=True,
     )
 
-    # ========================================================
-    # RISK RESULT
-    # ========================================================
-
-    score: Mapped[float] = mapped_column(
+    # Risk result
+    risk_score: Mapped[float] = mapped_column(
         Float,
         nullable=False,
         default=0.0,
@@ -273,10 +234,7 @@ class ScanRecord(Base):
         default="",
     )
 
-    # ========================================================
-    # MODEL / ENGINE DATA
-    # ========================================================
-
+    # Engine metadata
     model_score: Mapped[float] = mapped_column(
         Float,
         nullable=False,
@@ -284,47 +242,48 @@ class ScanRecord(Base):
     )
 
     rule_adjusted: Mapped[bool] = mapped_column(
+        Boolean,
         nullable=False,
         default=False,
     )
 
-    # ========================================================
-    # JSON DATA
-    # ========================================================
-
-    xai_json: Mapped[str] = mapped_column(
+    # JSON text fields
+    xai: Mapped[str] = mapped_column(
         Text,
         nullable=False,
         default="[]",
     )
 
-    features_json: Mapped[str] = mapped_column(
+    features: Mapped[str] = mapped_column(
         Text,
         nullable=False,
         default="{}",
     )
 
     metadata_json: Mapped[str] = mapped_column(
+        "metadata",
         Text,
         nullable=False,
         default="{}",
     )
 
-    threat_intelligence_json: Mapped[str] = mapped_column(
+    threat_intelligence: Mapped[str] = mapped_column(
         Text,
         nullable=False,
         default="{}",
     )
 
-    trace_json: Mapped[str] = mapped_column(
+    trace: Mapped[str] = mapped_column(
         Text,
         nullable=False,
         default="{}",
     )
 
-    # ========================================================
-    # TIMESTAMP
-    # ========================================================
+    status: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        default="success",
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -340,69 +299,161 @@ class ScanRecord(Base):
         onupdate=utc_now,
     )
 
-    __table_args__ = (
-        Index(
-            "ix_scan_records_created_severity",
-            "created_at",
-            "severity",
-        ),
-        Index(
-            "ix_scan_records_type_created",
-            "input_type",
-            "created_at",
-        ),
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to API-friendly dict."""
+        return {
+            "id": self.id,
+            "scan_id": self.scan_id,
+            "scan_type": self.scan_type,
+            "input_type": self.scan_type,
+            "input_value": self.input_value,
+            "risk_score": self.risk_score,
+            "score": self.risk_score,
+            "severity": self.severity,
+            "explanation": self.explanation,
+            "model_score": self.model_score,
+            "rule_adjusted": self.rule_adjusted,
+            "xai": json_loads(self.xai),
+            "features": json_loads(self.features),
+            "metadata": json_loads(self.metadata_json),
+            "threat_intelligence": json_loads(self.threat_intelligence),
+            "trace": json_loads(self.trace),
+            "status": self.status,
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at else None
+            ),
+            "updated_at": (
+                self.updated_at.isoformat()
+                if self.updated_at else None
+            ),
+        }
+
+
+# ============================================================
+# USER MODEL (for auth_service.py)
+# ============================================================
+
+class User(Base):
+    """
+    CyberGuard X user account.
+    """
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
     )
 
+    email: Mapped[str] = mapped_column(
+        String(320),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    name: Mapped[Optional[str]] = mapped_column(
+        String(120),
+        nullable=True,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    last_login_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Safe dict (no password_hash)."""
+        return {
+            "id": self.id,
+            "email": self.email,
+            "name": self.name,
+            "is_active": self.is_active,
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at else None
+            ),
+            "last_login_at": (
+                self.last_login_at.isoformat()
+                if self.last_login_at else None
+            ),
+        }
+
 
 # ============================================================
-# DATABASE INITIALIZATION
+# INITIALIZATION
 # ============================================================
-
 
 def init_db() -> None:
-    """
-    Create database tables if they do not already exist.
-    """
-
+    """Create tables if not exist."""
     try:
-        Base.metadata.create_all(
-            bind=engine,
-        )
-
-        logger.info(
-            "CYBERGUARD X database initialized."
-        )
-
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database initialized successfully.")
     except SQLAlchemyError as exc:
-        logger.exception(
-            "Database initialization failed."
-        )
+        logger.exception("Database initialization failed.")
         raise RuntimeError(
-            "Could not initialize CYBERGUARD X database."
+            "Could not initialize database."
         ) from exc
+
+
+# Alias for main.py compatibility
+initialize_database = init_db
+
+
+def close_db() -> None:
+    """Dispose engine connection pool."""
+    try:
+        engine.dispose()
+        logger.info("Database engine disposed.")
+    except Exception:
+        logger.exception("Error disposing database engine.")
+
+
+# Alias for main.py compatibility
+close_database = close_db
 
 
 # ============================================================
 # SESSION MANAGEMENT
 # ============================================================
 
-
 def get_db() -> Generator[Session, None, None]:
     """
     FastAPI dependency for database sessions.
 
-    Example:
-
-        @app.get("/history")
-        def history(db: Session = Depends(get_db)):
+    Usage:
+        def route(db: Session = Depends(get_db)):
             ...
     """
-
     db = SessionLocal()
-
     try:
         yield db
-
     finally:
         db.close()
 
@@ -410,94 +461,77 @@ def get_db() -> Generator[Session, None, None]:
 @contextmanager
 def database_session() -> Generator[Session, None, None]:
     """
-    Context-manager style database session.
-
-    Useful outside FastAPI dependency injection.
+    Context-manager style session with auto-commit/rollback.
     """
-
     db = SessionLocal()
-
     try:
         yield db
         db.commit()
-
     except Exception:
         db.rollback()
         raise
-
     finally:
         db.close()
 
 
-# ============================================================
-# SERIALIZATION
-# ============================================================
-
-
-def scan_record_to_dict(
-    record: ScanRecord,
-    include_input: bool = True,
-) -> dict[str, Any]:
+def get_database_session() -> Session:
     """
-    Convert ScanRecord into API-friendly JSON-compatible data.
+    Return a new database session.
+
+    Used by history_service.py.
+
+    IMPORTANT:
+        Caller is responsible for commit/rollback/close.
     """
-
-    result: dict[str, Any] = {
-        "scan_id": record.scan_id,
-        "input_type": record.input_type,
-        "score": round(float(record.score or 0.0), 2),
-        "risk_score": round(float(record.score or 0.0), 2),
-        "severity": record.severity,
-        "explanation": record.explanation,
-        "model_score": round(
-            float(record.model_score or 0.0),
-            2,
-        ),
-        "rule_adjusted": bool(record.rule_adjusted),
-        "xai": json_loads(record.xai_json),
-        "features": json_loads(record.features_json),
-        "metadata": json_loads(record.metadata_json),
-        "threat_intelligence": json_loads(
-            record.threat_intelligence_json
-        ),
-        "trace": json_loads(record.trace_json),
-        "created_at": (
-            record.created_at.isoformat()
-            if record.created_at
-            else None
-        ),
-        "updated_at": (
-            record.updated_at.isoformat()
-            if record.updated_at
-            else None
-        ),
-    }
-
-    if include_input:
-        result["input"] = record.input_value
-
-        if record.original_url:
-            result["original_url"] = record.original_url
-
-        if record.final_url:
-            result["final_url"] = record.final_url
-
-        if record.domain:
-            result["domain"] = record.domain
-
-    return result
+    return SessionLocal()
 
 
 # ============================================================
-# CREATE SCAN
+# HEALTH CHECK
 # ============================================================
 
+def health_check() -> dict[str, Any]:
+    """
+    Check database connectivity.
+
+    Used by main.py readiness endpoint.
+    """
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+
+        return {
+            "healthy": True,
+            "ready": True,
+            "message": "Database is available.",
+            "database_url_type": (
+                "sqlite"
+                if DATABASE_URL.startswith("sqlite")
+                else "external"
+            ),
+        }
+    except SQLAlchemyError as exc:
+        logger.exception("Database health check failed.")
+        return {
+            "healthy": False,
+            "ready": False,
+            "message": f"Database unavailable: {exc}",
+        }
+
+
+# Alias for main.py
+check_database_health = health_check
+
+
+# ============================================================
+# SCAN CRUD HELPERS
+# ============================================================
 
 def create_scan(
     db: Session,
     *,
     scan_id: Optional[str] = None,
-    input_type: str,
+    scan_type: str,
     input_value: Optional[str] = None,
     assessment: Optional[dict[str, Any]] = None,
     metadata: Optional[dict[str, Any]] = None,
@@ -506,25 +540,13 @@ def create_scan(
     original_url: Optional[str] = None,
     final_url: Optional[str] = None,
     domain: Optional[str] = None,
+    status: str = "success",
 ) -> ScanRecord:
     """
     Persist a completed scan.
 
-    The assessment object is expected to come from risk_engine.py.
-
-    Example:
-
-        record = create_scan(
-            db,
-            input_type="url",
-            input_value=url,
-            assessment=assessment,
-            metadata=metadata,
-            trace=trace,
-            threat_intelligence=vt_result,
-        )
+    Used by history_service.py and scan_service.py.
     """
-
     assessment = assessment or {}
     metadata = metadata or {}
     trace = trace or {}
@@ -543,90 +565,41 @@ def create_scan(
     )
 
     model_score = float(
-        assessment.get(
-            "model_score",
-            score,
-        ) or 0.0
+        assessment.get("model_score", score) or 0.0
     )
 
     severity = normalize_string(
-        assessment.get(
-            "severity",
-            "LOW",
-        ),
+        assessment.get("severity", "LOW"),
         20,
     ).upper()
 
     explanation = normalize_string(
-        assessment.get(
-            "explanation",
-            "",
-        ),
+        assessment.get("explanation", ""),
         10000,
     )
 
     record = ScanRecord(
         scan_id=scan_id,
-        input_type=normalize_string(
-            input_type,
-            50,
-        ),
-        input_value=normalize_string(
-            input_value,
-            50000,
-        ),
-        original_url=normalize_string(
-            original_url,
-            4096,
-        ) or None,
-        final_url=normalize_string(
-            final_url,
-            4096,
-        ) or None,
-        domain=normalize_string(
-            domain,
-            255,
-        ).lower() or None,
-        score=max(
-            0.0,
-            min(score, 100.0),
-        ),
+        scan_type=normalize_string(scan_type, 50),
+        input_value=normalize_string(input_value, 50000) or None,
+        original_url=normalize_string(original_url, 4096) or None,
+        final_url=normalize_string(final_url, 4096) or None,
+        domain=normalize_string(domain, 255).lower() or None,
+        risk_score=max(0.0, min(score, 100.0)),
         severity=severity,
         explanation=explanation,
-        model_score=max(
-            0.0,
-            min(model_score, 100.0),
+        model_score=max(0.0, min(model_score, 100.0)),
+        rule_adjusted=bool(assessment.get("rule_adjusted", False)),
+        xai=json_dumps(
+            assessment.get("xai")
+            or assessment.get("xai_breakdown")
+            or []
         ),
-        rule_adjusted=bool(
-            assessment.get(
-                "rule_adjusted",
-                False,
-            )
-        ),
-        xai_json=json_dumps(
-            assessment.get(
-                "xai",
-                assessment.get(
-                    "xai_breakdown",
-                    [],
-                ),
-            )
-        ),
-        features_json=json_dumps(
-            assessment.get(
-                "features",
-                {},
-            )
-        ),
-        metadata_json=json_dumps(
-            metadata,
-        ),
-        threat_intelligence_json=json_dumps(
-            threat_intelligence,
-        ),
-        trace_json=json_dumps(
-            trace,
-        ),
+        features=json_dumps(assessment.get("features", {})),
+        metadata_json=json_dumps(metadata),
+        threat_intelligence=json_dumps(threat_intelligence),
+        trace=json_dumps(trace),
+        status=normalize_string(status, 50),
         created_at=utc_now(),
         updated_at=utc_now(),
     )
@@ -635,84 +608,28 @@ def create_scan(
         db.add(record)
         db.commit()
         db.refresh(record)
-
         return record
-
     except SQLAlchemyError as exc:
         db.rollback()
-
-        logger.exception(
-            "Could not persist scan %s.",
-            scan_id,
-        )
-
+        logger.exception("Could not persist scan %s.", scan_id)
         raise RuntimeError(
             "Could not save scan result."
         ) from exc
-
-
-# ============================================================
-# GET SCAN BY ID
-# ============================================================
 
 
 def get_scan_by_id(
     db: Session,
     scan_id: str,
 ) -> Optional[ScanRecord]:
-    """
-    Retrieve one scan by its public scan_id.
-    """
-
-    scan_id = normalize_string(
-        scan_id,
-        64,
-    )
-
+    """Retrieve one scan by scan_id."""
+    scan_id = normalize_string(scan_id, 64)
     if not scan_id:
         return None
 
-    statement = select(
-        ScanRecord
-    ).where(
+    stmt = select(ScanRecord).where(
         ScanRecord.scan_id == scan_id
     )
-
-    return db.scalar(statement)
-
-
-# ============================================================
-# GET SCAN RESULT
-# ============================================================
-
-
-def get_scan_result(
-    db: Session,
-    scan_id: str,
-    *,
-    include_input: bool = True,
-) -> Optional[dict[str, Any]]:
-    """
-    Retrieve a serialized scan result.
-    """
-
-    record = get_scan_by_id(
-        db,
-        scan_id,
-    )
-
-    if record is None:
-        return None
-
-    return scan_record_to_dict(
-        record,
-        include_input=include_input,
-    )
-
-
-# ============================================================
-# SCAN HISTORY
-# ============================================================
+    return db.scalar(stmt)
 
 
 def list_scans(
@@ -720,138 +637,58 @@ def list_scans(
     *,
     page: int = 1,
     page_size: int = 20,
-    input_type: Optional[str] = None,
+    scan_type: Optional[str] = None,
     severity: Optional[str] = None,
     search: Optional[str] = None,
-    include_input: bool = False,
 ) -> dict[str, Any]:
-    """
-    Paginated scan history.
-
-    Supported filters:
-
-        input_type
-        severity
-        search
-
-    Search currently checks:
-        scan_id
-        domain
-        original_url
-        final_url
-    """
-
-    page = max(
-        1,
-        int(page),
-    )
-
-    page_size = max(
-        1,
-        min(
-            int(page_size),
-            100,
-        ),
-    )
+    """Paginated scan history."""
+    page = max(1, int(page))
+    page_size = max(1, min(int(page_size), 100))
 
     conditions = []
 
-    if input_type:
+    if scan_type:
         conditions.append(
-            ScanRecord.input_type
-            == normalize_string(
-                input_type,
-                50,
-            )
+            ScanRecord.scan_type == normalize_string(scan_type, 50)
         )
 
     if severity:
         conditions.append(
-            ScanRecord.severity
-            == normalize_string(
-                severity,
-                20,
-            ).upper()
+            ScanRecord.severity == normalize_string(severity, 20).upper()
         )
 
     if search:
-        search_value = (
-            f"%{normalize_string(search, 255)}%"
-        )
-
+        search_value = f"%{normalize_string(search, 255)}%"
         conditions.append(
-            (
-                ScanRecord.scan_id.ilike(
-                    search_value
-                )
-                | ScanRecord.domain.ilike(
-                    search_value
-                )
-                | ScanRecord.original_url.ilike(
-                    search_value
-                )
-                | ScanRecord.final_url.ilike(
-                    search_value
-                )
-            )
+            ScanRecord.scan_id.ilike(search_value)
+            | ScanRecord.domain.ilike(search_value)
+            | ScanRecord.original_url.ilike(search_value)
+            | ScanRecord.final_url.ilike(search_value)
         )
 
-    # --------------------------------------------------------
-    # Total count
-    # --------------------------------------------------------
-
-    count_statement = select(
-        func.count()
-    ).select_from(
-        ScanRecord
-    )
-
+    # Count
+    count_stmt = select(func.count()).select_from(ScanRecord)
     if conditions:
-        count_statement = count_statement.where(
-            *conditions
-        )
+        count_stmt = count_stmt.where(*conditions)
+    total = int(db.scalar(count_stmt) or 0)
 
-    total = int(
-        db.scalar(count_statement) or 0
-    )
-
-    # --------------------------------------------------------
     # Records
-    # --------------------------------------------------------
-
-    offset = (
-        page - 1
-    ) * page_size
-
-    statement = (
+    offset = (page - 1) * page_size
+    stmt = (
         select(ScanRecord)
         .where(*conditions)
-        .order_by(
-            ScanRecord.created_at.desc()
-        )
+        .order_by(ScanRecord.created_at.desc())
         .offset(offset)
         .limit(page_size)
     )
-
-    records = list(
-        db.scalars(statement)
-    )
+    records = list(db.scalars(stmt))
 
     total_pages = (
-        (total + page_size - 1)
-        // page_size
-        if total
-        else 0
+        (total + page_size - 1) // page_size if total else 0
     )
 
     return {
-        "items": [
-            scan_record_to_dict(
-                record,
-                include_input=include_input,
-            )
-            for record in records
-        ],
+        "items": [r.to_dict() for r in records],
         "pagination": {
             "page": page,
             "page_size": page_size,
@@ -863,28 +700,12 @@ def list_scans(
     }
 
 
-# ============================================================
-# DELETE ONE SCAN
-# ============================================================
-
-
 def delete_scan(
     db: Session,
     scan_id: str,
 ) -> bool:
-    """
-    Delete one scan.
-
-    Returns:
-        True  -> deleted
-        False -> scan did not exist
-    """
-
-    record = get_scan_by_id(
-        db,
-        scan_id,
-    )
-
+    """Delete one scan record."""
+    record = get_scan_by_id(db, scan_id)
     if record is None:
         return False
 
@@ -892,342 +713,105 @@ def delete_scan(
         db.delete(record)
         db.commit()
         return True
-
     except SQLAlchemyError as exc:
         db.rollback()
-
-        logger.exception(
-            "Could not delete scan %s.",
-            scan_id,
-        )
-
-        raise RuntimeError(
-            "Could not delete scan."
-        ) from exc
-
-
-# ============================================================
-# DELETE OLD SCANS
-# ============================================================
-
-
-def delete_scans_before(
-    db: Session,
-    cutoff: datetime,
-) -> int:
-    """
-    Delete scans older than the supplied UTC timestamp.
-
-    Useful for retention policies.
-    """
-
-    try:
-        statement = delete(
-            ScanRecord
-        ).where(
-            ScanRecord.created_at < cutoff
-        )
-
-        result = db.execute(statement)
-        db.commit()
-
-        return int(
-            result.rowcount or 0
-        )
-
-    except SQLAlchemyError as exc:
-        db.rollback()
-
-        logger.exception(
-            "Could not delete old scan records."
-        )
-
-        raise RuntimeError(
-            "Could not delete old scans."
-        ) from exc
-
-
-# ============================================================
-# DATABASE STATISTICS
-# ============================================================
+        logger.exception("Could not delete scan %s.", scan_id)
+        raise RuntimeError("Could not delete scan.") from exc
 
 
 def get_scan_statistics(
     db: Session,
 ) -> dict[str, Any]:
-    """
-    Return dashboard-friendly scan statistics.
-    """
-
+    """Dashboard statistics."""
     total = int(
-        db.scalar(
-            select(
-                func.count()
-            ).select_from(
-                ScanRecord
-            )
-        )
-        or 0
+        db.scalar(select(func.count()).select_from(ScanRecord)) or 0
     )
 
-    # --------------------------------------------------------
-    # Severity counts
-    # --------------------------------------------------------
-
     severity_rows = db.execute(
-        select(
-            ScanRecord.severity,
-            func.count(ScanRecord.id),
-        )
-        .group_by(
-            ScanRecord.severity
-        )
+        select(ScanRecord.severity, func.count(ScanRecord.id))
+        .group_by(ScanRecord.severity)
     ).all()
 
     severity_counts = {
-        str(severity).upper(): int(count)
-        for severity, count in severity_rows
+        str(sev).upper(): int(cnt)
+        for sev, cnt in severity_rows
     }
 
-    # --------------------------------------------------------
-    # Input type counts
-    # --------------------------------------------------------
-
     type_rows = db.execute(
-        select(
-            ScanRecord.input_type,
-            func.count(ScanRecord.id),
-        )
-        .group_by(
-            ScanRecord.input_type
-        )
+        select(ScanRecord.scan_type, func.count(ScanRecord.id))
+        .group_by(ScanRecord.scan_type)
     ).all()
 
     type_counts = {
-        str(input_type): int(count)
-        for input_type, count in type_rows
+        str(t): int(c) for t, c in type_rows
     }
 
-    # --------------------------------------------------------
-    # Average risk
-    # --------------------------------------------------------
-
-    average_score = db.scalar(
-        select(
-            func.avg(
-                ScanRecord.score
-            )
-        )
-    )
+    avg = db.scalar(select(func.avg(ScanRecord.risk_score)))
 
     return {
         "total_scans": total,
-        "average_risk_score": round(
-            float(
-                average_score or 0.0
-            ),
-            2,
-        ),
+        "average_risk_score": round(float(avg or 0.0), 2),
         "severity_counts": severity_counts,
-        "input_type_counts": type_counts,
+        "scan_type_counts": type_counts,
     }
-
-
-# ============================================================
-# DATABASE HEALTH
-# ============================================================
-
-
-def database_health() -> dict[str, Any]:
-    """
-    Check whether the database is reachable.
-    """
-
-    try:
-        with engine.connect() as connection:
-            connection.execute(
-                text("SELECT 1")
-            )
-
-        return {
-            "status": "healthy",
-            "database": "available",
-            "database_url_type": (
-                "sqlite"
-                if DATABASE_URL.startswith("sqlite")
-                else "external"
-            ),
-        }
-
-    except SQLAlchemyError as exc:
-        logger.exception(
-            "Database health check failed."
-        )
-
-        return {
-            "status": "unhealthy",
-            "database": "unavailable",
-            "error": str(exc),
-        }
 
 
 # ============================================================
 # STARTUP
 # ============================================================
 
-
 def startup_database() -> None:
-    """
-    Application startup helper.
-
-    app_upgraded-5.py can call:
-
-        startup_database()
-
-    during FastAPI startup.
-    """
-
+    """Called during FastAPI startup."""
     init_db()
 
 
-# ============================================================
-# SHUTDOWN
-# ============================================================
-
-
 def shutdown_database() -> None:
-    """
-    Dispose the SQLAlchemy connection pool.
-    """
-
-    try:
-        engine.dispose()
-
-    except Exception:
-        logger.exception(
-            "Database engine shutdown encountered an error."
-        )
+    """Called during FastAPI shutdown."""
+    close_db()
 
 
 # ============================================================
-# LOCAL SELF-TEST
+# LOCAL TEST
 # ============================================================
 
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
 
-def _self_test() -> None:
-    """
-    Basic local database test.
-
-    Run:
-
-        python database.py
-    """
-
-    logging.basicConfig(
-        level=logging.INFO,
-    )
-
-    print(
-        "\nCYBERGUARD X Database Self-Test"
-    )
-    print(
-        "================================"
-    )
+    print()
+    print("=" * 60)
+    print("CYBERGUARD X — Database Test")
+    print("=" * 60)
+    print()
 
     startup_database()
 
-    with database_session() as db:
+    health = health_check()
+    print(f"Health: {health}")
+    print()
 
+    with database_session() as db:
         record = create_scan(
             db,
-            input_type="url",
+            scan_type="url",
             input_value="https://example.com",
             original_url="https://example.com",
             final_url="https://example.com",
             domain="example.com",
             assessment={
                 "score": 12.5,
-                "risk_score": 12.5,
                 "severity": "LOW",
-                "explanation": (
-                    "No major high-confidence risk indicators "
-                    "were identified."
-                ),
-                "model_score": 12.5,
-                "rule_adjusted": False,
-                "xai": [
-                    "Test scan created successfully."
-                ],
-                "features": {
-                    "domain_novelty": 0.1,
-                    "redirect_chain_depth": 0.0,
-                },
+                "explanation": "Test scan",
+                "xai": ["Test"],
             },
-            metadata={
-                "self_test": True
-            },
-            trace={
-                "original_url": "https://example.com",
-                "final_url": "https://example.com",
-                "hops": [],
-            },
-            threat_intelligence={
-                "scanned": False,
-                "reason": "self_test",
-            },
+            metadata={"test": True},
         )
 
-        print(
-            f"Created scan: {record.scan_id}"
-        )
+        print(f"Created scan: {record.scan_id}")
 
-        result = get_scan_result(
-            db,
-            record.scan_id,
-        )
+        stats = get_scan_statistics(db)
+        print(f"Stats: {stats}")
 
-        print(
-            "Retrieved:"
-        )
-        print(
-            json.dumps(
-                result,
-                indent=2,
-                default=str,
-            )
-        )
-
-        statistics = get_scan_statistics(
-            db
-        )
-
-        print(
-            "\nStatistics:"
-        )
-        print(
-            json.dumps(
-                statistics,
-                indent=2,
-            )
-        )
-
-        deleted = delete_scan(
-            db,
-            record.scan_id,
-        )
-
-        print(
-            f"\nDeleted test scan: {deleted}"
-        )
-
-    print(
-        "\nDatabase self-test completed."
-    )
-
-
-# ============================================================
-# MAIN
-# ============================================================
-
-if __name__ == "__main__":
-    _self_test()
+    print()
+    print("=" * 60)
+    print("Database test completed.")
+    print("=" * 60)
