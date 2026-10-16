@@ -1,19 +1,57 @@
+# ============================================================
+# CYBERGUARD X — Render Deployment Configuration
+# ============================================================
+# Deploy target: Render Free Tier (512 MB RAM)
+# Uses: requirements-lite.txt (no torch, no playwright)
+#
+# After deploy, set these in Render Dashboard:
+#   SECRET_KEY         (generate with: openssl rand -hex 32)
+#   VIRUSTOTAL_API_KEY (optional)
+#   CORS_ORIGINS       (your frontend URL)
+# ============================================================
+
 services:
   - type: web
     name: cyberguard-x-backend
     runtime: python
     region: singapore
     plan: free
-
-    buildCommand: >
-      pip install -r requirements.txt &&
-      playwright install --with-deps chromium
-
-    startCommand: >
-      uvicorn backend.main:app
-      --host 0.0.0.0
-      --port $PORT
-
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health
+    buildCommand: |
+      pip install --upgrade pip &&
+      pip install -r requirements-lite.txt
+    startCommand: |
+      uvicorn backend.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12
+        value: "3.10.12"
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: API_PREFIX
+        value: ""
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        value: "sqlite:///./cyberguard.db"
+      - key: ALLOW_PRIVATE_NETWORKS
+        value: "false"
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_REQUESTS
+        value: "60"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: ENABLE_HSTS
+        value: "true"
