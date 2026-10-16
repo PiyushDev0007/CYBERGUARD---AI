@@ -38,7 +38,7 @@
 
 const CONFIG = Object.freeze({
     BACKEND_API:
-        "https://cybernexus-ai-td68.onrender.com",
+      BACKEND_API: "http://127.0.0.1:8000",  
 
     HEALTH_TIMEOUT_MS: 8000,
 
